@@ -1,5 +1,5 @@
 package com.example.demo.ootwImgs;
 
-public class Ootwimgs {
+public class Oootwimgs {
 
 }
