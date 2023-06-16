@@ -1,5 +1,5 @@
 package com.example.demo.omycloset;
 
-public class OmyCloset {
+public class Omycloset {
 
 }
