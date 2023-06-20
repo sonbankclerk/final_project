@@ -4,14 +4,13 @@ import com.example.demo.community.Ocommunity;
 import com.example.demo.member.Omember;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Setter
-@Getter
-@ToString
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OreportDto {

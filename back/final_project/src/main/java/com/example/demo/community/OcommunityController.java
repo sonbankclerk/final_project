@@ -36,15 +36,34 @@ public class OcommunityController {
 		map.put("list", list);
 		return map;
 	}
-	
+
+	// 태그 3개
+	@GetMapping("/{tag}")
+	public Map getByTag(@PathVariable("tag") String tag) {
+		ArrayList<OcommunityDto> tags = service.getTag();
+		Map map = new HashMap<>();
+		boolean flag = true;
+		try {
+			// 태그가 존재하고 3개보다 많은 경우 최대 3개까지만 가져오도록 수정
+			if (tags != null && tags.size() > 3) {
+				tags = (ArrayList<OcommunityDto>) tags.subList(0, 3);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			flag = false;
+		}
+		map.put("tags", tags);
+		return map;
+	}
+
 	// member로 검색
 	@GetMapping("/{memnum}")
 	public Map getByMemnum(@PathVariable("memnum") Omember memnum) {
 		Map map = new HashMap();
 		boolean flag = true;
 		try {
-			
-		}catch(Exception e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
 			flag = false;
 		}
@@ -58,16 +77,16 @@ public class OcommunityController {
 		boolean flag = true;
 		try {
 			// 게시글 이미지들이 들어가있을 폴더
-			File dir = new File(path+dto.getCommnum());
+			File dir = new File(path + dto.getCommnum());
 			dir.mkdir();
-			
+
 			// 이미지들 폴더에 생성하기.
 			String[] imgs = new String[3];
-			for(int i = 0 ; i < 3 ; i++) {
+			for (int i = 0; i < 3; i++) {
 				MultipartFile mf = mfArr[i];
-				
+
 				// 배열로 받은 파일들 중 없을 수도 있으니 조건문.
-				if(mf != null && !mf.isEmpty()) {
+				if (mf != null && !mf.isEmpty()) {
 					// 파일 삽입.
 					String fname = mf.getOriginalFilename();
 					String newpath = dir.getAbsolutePath() + "//" + fname;
@@ -76,21 +95,21 @@ public class OcommunityController {
 					imgs[i] = newpath;
 				}
 			}
-			
+
 			// 삽입된 파일이 있다면 dto 업데이트 후 다시 저장.
 			dto.setImg1(imgs[0]);
 			dto.setImg2(imgs[1]);
 			dto.setImg3(imgs[2]);
 			service.save(dto);
-			
-		}catch(Exception e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
 			flag = false;
 		}
 		map.put("flag", flag);
 		return map;
 	}
-	
+
 	// 게시물 삭제하기 ( 신고당했을 때도 이용하기 )
 	@DeleteMapping("")
 	public Map delOcommunity(int num) {
@@ -98,7 +117,7 @@ public class OcommunityController {
 		boolean flag = true;
 		try {
 			service.delOcommunity(num);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			flag = false;
 		}

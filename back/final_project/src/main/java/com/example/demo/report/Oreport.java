@@ -22,20 +22,20 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Oreport { //신고
+public class Oreport { //신고 문구 넣기(카테고리?)
 	
 	@Id
 	@SequenceGenerator(name="seq_oreport", sequenceName="seq_oreport", allocationSize=1)
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq_oreport")
-	private int repnum;
+	private int repnum; //신고 번호
 	
 	@ManyToOne
 	@JoinColumn(name="memnum", nullable=false) 
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	private Omember memnum;
+	private Omember memnum; //멤버 번호
 	
 	@ManyToOne
 	@JoinColumn(name="commnum", nullable=false) 
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	private Ocommunity commnum;
+	private Ocommunity commnum; //게시글 번호
 }

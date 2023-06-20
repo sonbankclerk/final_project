@@ -18,6 +18,9 @@ public interface OcommunityDao extends JpaRepository<Ocommunity, Integer> {
 	//Omember - id 로 검색하는거
 	ArrayList<Ocommunity> findByMemnum(Omember mb);
 	
+	//태그별 검색
+	ArrayList<Ocommunity> findByTagLike(String tag);
+	
 	// 좋아요 및 버튼 up.
 	@Query(value = "update ocommunity set :str = :str + 1 "
 				 + "where commnum = :num", nativeQuery = true)

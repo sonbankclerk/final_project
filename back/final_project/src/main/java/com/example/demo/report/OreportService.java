@@ -43,7 +43,8 @@ public class OreportService {
 	//신고 접수
 	public OreportDto save(OreportDto dto) {
 		Oreport rp = (Oreport)change(dto);
-		return (OreportDto) change(dao.save(rp));
+		OreportDto result = (OreportDto) change(dao.save(rp));
+		return result;
 	}
 	
 	//신고 접수 된 리스트 전체검색

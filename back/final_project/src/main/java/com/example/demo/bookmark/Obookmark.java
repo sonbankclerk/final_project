@@ -1,9 +1,9 @@
 package com.example.demo.bookmark;
 
 import org.hibernate.annotations.OnDelete;
-
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.example.demo.community.Ocommunity;
 import com.example.demo.member.Omember;
 
 import jakarta.persistence.Entity;
@@ -26,15 +26,15 @@ public class Obookmark {
 	@Id
 	@SequenceGenerator(name="seq_obookmark", sequenceName="seq_obookmark", allocationSize=1)
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq_obookmark")
-	private int bmnum;
+	private int bmnum; //북마크 번호
 	
 	@ManyToOne
 	@JoinColumn(name="commnum", nullable=false)  //fk 설정
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	private int commnum;
+	private Ocommunity commnum; //게시글 번호
 	
 	@ManyToOne
 	@JoinColumn(name="memnum", nullable=false)  //fk 설정
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	private Omember memnum;
+	private Omember memnum; //멤버 번호
 }

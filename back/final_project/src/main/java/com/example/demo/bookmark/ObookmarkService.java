@@ -45,12 +45,13 @@ public class ObookmarkService {
 		}
 		
 		//북마크(즐겨찾기)
-		public int save(ObookmarkDto dto) {
+		public ObookmarkDto save(ObookmarkDto dto) {
 			Obookmark bm = (Obookmark)change(dto);
-			return bm.getBmnum();
+			ObookmarkDto result = (ObookmarkDto)change(dao.save(bm));
+			return result;
 		}
 		
-		//북마크 전체검색
+		//북마크 리스트 전체검색
 		public ArrayList<ObookmarkDto> getAll(){
 			ArrayList<Obookmark> list = (ArrayList<Obookmark>) dao.findAll();
 			ArrayList<ObookmarkDto> list2 = changeList(list);
