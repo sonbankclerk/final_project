@@ -69,7 +69,7 @@ public class OmemberController {
 	
 	//로그인
 	@PostMapping("/login")
-	public Map login(OmemberDto id, String pwd) {
+	public Map login(String id, String pwd) {
 		Map map = new HashMap();
 		boolean flag = false;
 		OmemberDto dto = service.getMember(id);
@@ -98,7 +98,7 @@ public class OmemberController {
 			}
 		}
 		if(flag) {
-			OmemberDto old = service.getMember(dto);
+			OmemberDto old = service.getMember(dto.getId());
 			old.setPwd(dto.getPwd());
 			old.setNickname(dto.getNickname());
 			OmemberDto d = service.save(old);
@@ -131,16 +131,16 @@ public class OmemberController {
 		return map;
 	}
 	
-	//이미지파일 읽어오기 맞나욘?
+	//이미지파일 읽어오기
 		@GetMapping("/imgs/{memnum}")
-		public ResponseEntity<byte[]> readImg(@PathVariable("memnum") OmemberDto memnum) {
+		public ResponseEntity<byte[]> readImg(@PathVariable("memnum") int memnum) {
 			String fname = "";
-			OmemberDto dto = service.getMember(memnum);
+			OmemberDto dto = service.getByMemnum(memnum);
 			fname = dto.getImg();
 			
 			ResponseEntity<byte[]> result = null;
 			try {
-				if(fname != null && fname.length() == 0) {
+				if(fname != null && fname.length() != 0) {
 					File f = new File(fname);
 					HttpHeaders header = new HttpHeaders();
 					header.add("Content-Type", Files.probeContentType(f.toPath()));
