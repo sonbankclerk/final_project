@@ -51,7 +51,7 @@ public class OmemberController {
 			
 			String fname = mf.getOriginalFilename();
 			String newpath = dir.getAbsolutePath()+"\\"+fname;
-			File newFile = new File(path);
+			File newFile = new File(newpath);
 			mf.transferTo(newFile);
 			
 			dto.setImg(URLEncoder.encode(newpath, "utf-8"));
