@@ -40,19 +40,16 @@ public class OcommunityController {
 	// 태그 3개
 	@GetMapping("/{tag}")
 	public Map getByTag(@PathVariable("tag") String tag) {
-		ArrayList<OcommunityDto> tags = service.getTag();
 		Map map = new HashMap<>();
 		boolean flag = true;
 		try {
-			// 태그가 존재하고 3개보다 많은 경우 최대 3개까지만 가져오도록 수정
-			if (tags != null && tags.size() > 3) {
-				tags = (ArrayList<OcommunityDto>) tags.subList(0, 3);
-			}
+			ArrayList<OcommunityDto> tags = service.getByTag(tag);
+			map.put("tags", tags);
 		} catch (Exception e) {
 			e.printStackTrace();
 			flag = false;
 		}
-		map.put("tags", tags);
+		map.put("flag", flag);
 		return map;
 	}
 
