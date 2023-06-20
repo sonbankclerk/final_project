@@ -48,7 +48,7 @@ public class OmyclosetService {
 	public OmyclosetDto save(OmyclosetDto dto) {
 		Omycloset entity = dao.save(new Omycloset(dto.getClosetnum(), dto.getMemnum(), dto.getCloth(), dto.getImg(),
 				dto.getMaintag(), dto.getSubtag(), dto.getFavorite()));
-		return new OmyclosetDto(entity.getClosetnum(), entity.getMemnum(), entity.getCloth(), entity.getImg(), null,
+		return new OmyclosetDto(entity.getClosetnum(), entity.getMemnum(), entity.getCloth(), entity.getImg(), dto.getF(),
 				entity.getMaintag(), entity.getSubtag(), entity.getFavorite());
 //		return (OmyclosetDto)change(entity);
 	}

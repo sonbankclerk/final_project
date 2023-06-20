@@ -35,7 +35,7 @@ public class OmyclosetController {
 	
 	// 옷장에 옷 등록하기(POST)
 	@PostMapping("")
-	public Map addCloth(OmyclosetDto dto) {
+	public Map addCloth(OmyclosetDto dto, MultipartFile f) {
 		boolean flag = true;
 		OmyclosetDto dto2;
 		try {
@@ -43,7 +43,8 @@ public class OmyclosetController {
 			int num = dto.getClosetnum(); // 게시글 번호로 closet 하위폴더 생성하기 위해 num 설정
 			File dir = new File(path + num); // 하위폴더 경로 설정
 			dir.mkdir(); // 디렉토리 생성
-			MultipartFile f = dto.getF();
+			f = dto.getF();
+			System.out.println("f:" + f);
 			String img = "";
 			String fname = f.getOriginalFilename();
 			if(fname != null & !fname.equals("")) {
@@ -51,7 +52,7 @@ public class OmyclosetController {
 				File newfile = new File(newpath); // C:/closet/num/fname 복사 생성
 				try {
 					f.transferTo(newfile); // 파일 업로드하기
-					img = newpath; 
+					img = newpath;
 				} catch (IllegalStateException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -81,28 +82,31 @@ public class OmyclosetController {
 	}
 	
 	// 옷 이름, 카테고리, 사진 부분 수정하기(PUT / old & new 부분 수정)
-	@PutMapping("")
-	public Map edit(OmyclosetDto dto) {
+	@PutMapping("/{closetnum}")
+	public Map edit(@PathVariable("closetnum") int closetnum, OmyclosetDto dto) {
 		boolean flag = true;
 		OmyclosetDto dto2;
 		// 전달받은 dto num으로 수정전 옷 정보 불러와서 old에 새로 저장
-		OmyclosetDto old = service.getMyCloth(dto.getClosetnum());
+		OmyclosetDto old = service.getMyCloth(closetnum);
 		old.setCloth(dto.getCloth()); // old에 수정한 옷 이름 저장
 		old.setMaintag(dto.getMaintag()); // old에 수정한 메인태그 저장
 		old.setSubtag(dto.getSubtag()); // old에 수정한 서브태그 저장
 		try {
-			int num = dto.getClosetnum(); // 하위폴더명(번호) 호출 => c:/closet/'num'
-			MultipartFile oldf = old.getF(); // 받아온 번호로 불러온 옛날 옷의 (파일)정보 
-			MultipartFile newf = dto.getF(); // 받아온 수정된 파일
+			int num = closetnum; // 하위폴더명(번호) 호출 => c:/closet/'num'
+			MultipartFile newf = dto.getF();
 			String img = "";
-			String oldfname = oldf.getOriginalFilename(); // 원본(옛날옷)의 파일명
+			String oldfname = old.getImg(); // 원본(옛날옷)의 파일명
 			String newfname = newf.getOriginalFilename(); // 받아온 옷(수정된)의 파일명
+			System.out.println(oldfname);
+			System.out.println(newfname);
 			if(newfname != null & !newfname.equals("")) { // 받아온 옷이 null이 아니라면,
 				String newpath = path + num + "/" + newfname; // C:/closet/num/newfname.. 수정된 옷의 새로운 경로 지정
 				File newfile = new File(newpath); // 새로운 경로 C:/closet/num/newfname 복사 생성
+				System.out.println(newpath);
 				try {
 					String delimg = path + num + "/" + oldfname; // 원본파일경로
 					File oldfile = new File(delimg); // 원본파일 삭제 객체 생성
+					System.out.println(delimg);
 					oldfile.delete(); // 삭제
 					newf.transferTo(newfile); // 수정 파일 업로드하기
 					img = newpath; // 수정된 파일 새로운 경로
@@ -202,6 +206,7 @@ public class OmyclosetController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.out.println("result:" + result);
 		return result;
 	}
 	
