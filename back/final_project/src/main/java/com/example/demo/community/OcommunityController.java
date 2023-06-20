@@ -133,16 +133,15 @@ public class OcommunityController {
 	}
 	
 	//좋아요 부분 수정
-	@PatchMapping("/{btnlike}/{memnum}/{commnum}")
-	public Map likeUpAndDown(@PathVariable("btnlike") int btnlike, @PathVariable("memnum") int memnum,
-			@PathVariable("communm") int commnum) {
+	@PatchMapping("/{memnum}/{commnum}")
+	public Map likeUpAndDown(@PathVariable("memnum") int memnum, @PathVariable("communm") int commnum) {
 		boolean flag = true;
 		OlikebtnDto dto = likeservice.getByMemnumAndCommnum(memnum, commnum);
 		if(dto == null) { // 좋아요 안누름
-			service.upBtn(btnlike, commnum);
+			service.upBtn(commnum);
 			likeservice.save(dto);
 		} else { // 좋아요 누름
-			service.downBtn(btnlike, commnum);
+			service.downBtn(commnum);
 			likeservice.delOlikebtn(dto.getLikebtn());
 			flag = false; // 좋아요 눌려있으면 false 보내서 
 		}

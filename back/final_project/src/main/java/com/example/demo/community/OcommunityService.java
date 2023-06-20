@@ -74,13 +74,13 @@ public class OcommunityService {
 
 	// 좋아요 up
 	// btnlike = 좋아요 / num = 게시물 번호.
-	public void upBtn(int btnlike, int commnum) {
-		dao.upBtn(btnlike, commnum);
+	public void upBtn(int commnum) {
+		dao.upBtn(commnum);
 	}
 	
 	// 좋아요 down
-	public void downBtn(int btnlike, int commnum) {
-		dao.downBtn(btnlike, commnum);
+	public void downBtn(int commnum) {
+		dao.downBtn(commnum);
 	}
 
 	// 게시글 삭제

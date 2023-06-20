@@ -24,10 +24,10 @@ public interface OcommunityDao extends JpaRepository<Ocommunity, Integer> {
 	// 좋아요 up
 	@Query(value = "update ocommunity set btnlike = btnlike + 1 "
 				+ "where commnum = :commnum", nativeQuery = true)
-	void upBtn(@Param("btnlike") int btnlike, @Param("commnum") int commnum);
+	void upBtn(@Param("commnum") int commnum);
 	
 	// 좋아요 down.
 	@Query(value = "update ocommunity set btnlike = btnlike - 1 "
 				+ "where commnum = :commnum", nativeQuery = true)
-	void downBtn(@Param("btnlike") int btnlike, @Param("commnum") int commnum);
+	void downBtn(@Param("commnum") int commnum);
 }
