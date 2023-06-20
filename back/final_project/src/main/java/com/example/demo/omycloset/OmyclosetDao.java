@@ -25,13 +25,13 @@ public interface OmyclosetDao extends JpaRepository<Omycloset, Integer> {
 	// 즐겨찾기 on.. pk받아와서 0 => 1로 수정
 	@Transactional
 	@Modifying
-	@Query(value="update omycloset set favorite=1 where num=:num", nativeQuery=true)
+	@Query(value="update omycloset set favorite=1 where closetnum=:num", nativeQuery=true)
 	void updateFavoriteOn(@Param("num") int closetnum);
 	
 	// 즐겨찾기 off.. pk받아와서 1 => 0으로 수정
 	@Transactional
 	@Modifying
-	@Query(value="update omycloset set favorite=0 where num=:num", nativeQuery=true)
+	@Query(value="update omycloset set favorite=0 where closetnum=:num", nativeQuery=true)
 	void updateFavoriteOff(@Param("num") int closetnum);
 	
 }
