@@ -48,9 +48,8 @@ public class OmemberService {
 	}
 	
 	// 로그인, 내정보확인
-	public OmemberDto getMember(OmemberDto dto) {
-		int num = dto.getMemnum();
-		Omember m = dao.findById(num).orElse(null);
+	public OmemberDto getMember(String id) {
+		Omember m = dao.findById(id);
 		if(m==null) {
 			return null;
 		}
@@ -68,4 +67,12 @@ public class OmemberService {
 		return (OmemberDto)change(m);
 	}
 	
+	// 회원번호로 회원 조회
+	public OmemberDto getByMemnum(int memnum) {
+		Omember m = dao.findById(memnum).orElse(null);
+		if(m == null) {
+			return null;
+		}
+		return (OmemberDto)change(m);
+	}
 }
