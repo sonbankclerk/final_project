@@ -1,13 +1,11 @@
- package com.example.demo.report;
+package com.example.demo.likebnt;
 
 import org.hibernate.annotations.OnDelete;
-
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.example.demo.community.Ocommunity;
 import com.example.demo.member.Omember;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,25 +19,22 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class Oreport { 
+@AllArgsConstructor
+public class Olikebtn {
 	
 	@Id
-	@SequenceGenerator(name="seq_oreport", sequenceName="seq_oreport", allocationSize=1)
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq_oreport")
-	private int repnum; //신고 번호
-	
-	@ManyToOne
-	@JoinColumn(name="memnum", nullable=false) 
-	@OnDelete(action = OnDeleteAction.CASCADE)
-	private Omember memnum; //멤버 번호
+	@SequenceGenerator(name="seq_olikebtn", sequenceName="seq_olikebtn", allocationSize=1)
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq_olikebtn")
+	private int likenum;
 	
 	@ManyToOne
 	@JoinColumn(name="commnum", nullable=false) 
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	private Ocommunity commnum; //게시글 번호
+	private Ocommunity commnum;
 	
-	@Column(nullable=false)
-	private String category; //신고내용 카테고리(1.홍보/도배 2.스팸 3.음란성 4.기타())
+	@ManyToOne
+	@JoinColumn(name="memnum", nullable=false) 
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private Omember memnum;
 }

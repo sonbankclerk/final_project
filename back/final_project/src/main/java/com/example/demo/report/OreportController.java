@@ -20,8 +20,8 @@ public class OreportController {
 
 	@Autowired
 	private OreportService service;
-	
-	//전체목록 검색
+
+	// 전체목록 검색
 	@GetMapping("")
 	public Map getAll() {
 		ArrayList<OreportDto> list = service.getAll();
@@ -29,21 +29,7 @@ public class OreportController {
 		map.put(list, list);
 		return map;
 	}
-	
-	//신고번호로 삭제
-	@DeleteMapping("/{repnum}")
-	public Map del(@PathVariable("repnum") int repnum) {
-		boolean flag = true;
-		Map map = new HashMap();
-		try {
-			service.delOreport(repnum);
-		}catch(Exception e) {
-			flag = false;
-		}
-		map.put("flag", flag);
-		return map;
-	}
-	
+
 	// 신고 접수 (추가)
 	@PostMapping("")
 	public Map save(OreportDto dto) {
@@ -52,11 +38,26 @@ public class OreportController {
 		try {
 			OreportDto result = service.save(dto);
 			map.put("dto", result);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			flag = false;
 		}
 		map.put("flag", flag);
 		return map;
 	}
+
+	// 신고번호로 삭제
+	@DeleteMapping("/{repnum}")
+	public Map del(@PathVariable("repnum") int repnum) {
+		boolean flag = true;
+		Map map = new HashMap();
+		try {
+			service.delOreport(repnum);
+		} catch (Exception e) {
+			flag = false;
+		}
+		map.put("flag", flag);
+		return map;
+	}
+
 }

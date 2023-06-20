@@ -10,13 +10,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.demo.likebnt.OlikebtnDto;
+import com.example.demo.likebnt.OlikebtnService;
 import com.example.demo.member.Omember;
+import com.example.demo.member.OmemberDto;
+import com.example.demo.member.OmemberService;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -24,11 +29,14 @@ import com.example.demo.member.Omember;
 public class OcommunityController {
 	@Autowired
 	private OcommunityService service;
-
+	
+	@Autowired
+	private OlikebtnService likeservice; //좋아요 누적
+	
 	@Value("${spring.servlet.multipart.location}")
 	private String path; // C:/comm/
 
-	// 전체목록 검색
+	// 게시글 전체목록 검색
 	@GetMapping("")
 	public Map getAll() {
 		ArrayList<OcommunityDto> list = service.getAll();
@@ -36,8 +44,24 @@ public class OcommunityController {
 		map.put("list", list);
 		return map;
 	}
+	
+	//게시글 번호로 검색
+	@GetMapping("/{commnum}")
+	public Map getByTag(@PathVariable("commnum") int commnum) {
+		Map map = new HashMap<>();
+		boolean flag = true;
+		try {
+			OcommunityDto dto = service.getByCommnum(commnum);
+			map.put("dto", dto);
+		} catch (Exception e) {
+			e.printStackTrace();
+			flag = false;
+		}
+		map.put("flag", flag);
+		return map;
+	}
 
-	// 태그 3개
+	// 게시글 태그 검색
 	@GetMapping("/{tag}")
 	public Map getByTag(@PathVariable("tag") String tag) {
 		Map map = new HashMap<>();
@@ -53,21 +77,7 @@ public class OcommunityController {
 		return map;
 	}
 
-	// member로 검색
-	@GetMapping("/{memnum}")
-	public Map getByMemnum(@PathVariable("memnum") Omember memnum) {
-		Map map = new HashMap();
-		boolean flag = true;
-		try {
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			flag = false;
-		}
-		return map;
-	}
-
-	// 게시물 생성.
+	// 게시글 생성.
 	@PostMapping("")
 	public Map save(OcommunityDto dto, MultipartFile[] mfArr) {
 		Map map = new HashMap<>();
@@ -121,4 +131,24 @@ public class OcommunityController {
 		map.put("flag", flag);
 		return map;
 	}
+	
+	//좋아요 부분 수정
+	@PatchMapping("/{btnlike}/{memnum}/{commnum}")
+	public Map likeUpAndDown(@PathVariable("btnlike") int btnlike, @PathVariable("memnum") int memnum,
+			@PathVariable("communm") int commnum) {
+		boolean flag = true;
+		OlikebtnDto dto = likeservice.getByMemnumAndCommnum(memnum, commnum);
+		if(dto == null) { // 좋아요 안누름
+			service.upBtn(btnlike, commnum);
+			likeservice.save(dto);
+		} else { // 좋아요 누름
+			service.downBtn(btnlike, commnum);
+			likeservice.delOlikebtn(dto.getLikebtn());
+			flag = false; // 좋아요 눌려있으면 false 보내서 
+		}
+		Map map = new HashMap<>();
+		map.put("flag", flag);
+		return map;
+	}
+	
 }

@@ -19,9 +19,10 @@ public class OcommunityDto {
 	private Omember memnum;
 	private String tag;
 	private int btnlike;
+	
 //	private int btngood;
 //	private int btnwhat;
-	private int btnsad;
+//	private int btnsad;
 	
 	private String img1;
 	private String img2;

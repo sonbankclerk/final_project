@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.member.Omember;
+
 @Service
 public class OcommunityService {
 	@Autowired
@@ -19,12 +21,12 @@ public class OcommunityService {
 			Ocommunity temp = (Ocommunity) obj;
 			// vo의 값들을 dto 생성자를 이용하여 새로 생긴 dto에 값을 기입해준 후 리턴한다.
 			return new OcommunityDto(temp.getCommnum(), temp.getMemnum(), temp.getTag(), temp.getBtnlike(),
-					temp.getBtnsad(), temp.getImg1(), temp.getImg2(), temp.getImg3());
+					temp.getImg1(), temp.getImg2(), temp.getImg3());
 		} else {
 			// 반대로 한다.
 			OcommunityDto temp = (OcommunityDto) obj;
 			return new Ocommunity(temp.getCommnum(), temp.getMemnum(), temp.getTag(), temp.getBtnlike(),
-					temp.getBtnsad(), temp.getImg1(), temp.getImg2(), temp.getImg3());
+					 temp.getImg1(), temp.getImg2(), temp.getImg3());
 		}
 	}
 
@@ -55,6 +57,12 @@ public class OcommunityService {
 		ArrayList<OcommunityDto> list2 = changeList(list);
 		return list2;
 	}
+	
+	//게시글 번호로 검색
+	public OcommunityDto getByCommnum(int commnum) {
+		Ocommunity entity = dao.findById(commnum).orElse(null);
+		return (OcommunityDto) change(entity);
+	}
 
 	//findBy컬럼명Like(컬럼타입)
 	// 태그별 검색
@@ -64,20 +72,20 @@ public class OcommunityService {
 	      return list2;
 	   }
 
-	// 좋아요 올리기
-	// str = [btnlike , btngood , btnsad , btnwhat] : 버튼 이름
-	// num = 게시물 번호.
-	public void upBtn(String str, int num) {
-		dao.upBtn(str, num);
+	// 좋아요 up
+	// btnlike = 좋아요 / num = 게시물 번호.
+	public void upBtn(int btnlike, int commnum) {
+		dao.upBtn(btnlike, commnum);
 	}
-
-	// 멤버로 select
-	/*
-	 * public OcommunityDto getByMemnum(String id) { }
-	 */
+	
+	// 좋아요 down
+	public void downBtn(int btnlike, int commnum) {
+		dao.downBtn(btnlike, commnum);
+	}
 
 	// 게시글 삭제
 	public void delOcommunity(int commnum) {
 		dao.deleteById(commnum);
 	}
+
 }

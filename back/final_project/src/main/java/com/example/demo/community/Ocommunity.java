@@ -38,25 +38,29 @@ public class Ocommunity {
 	private String tag;
 	
 	
-	//기능 2개로 줄이는거 얘기하기 (긍정 1개 / 부정 1개)
+	//기능 한개로 통일
 	private int btnlike; //좋아요
+	
+	//삭제
 	//private int btngood; //멋져요
 	//private int btnwhat; //이게뭐에요?
-	private int btnsad; //아쉬워요
+	//private int btnsad; //아쉬워요
 	
 	//Ocommimgs 삭제하고 img1~3 추가
-	@Column(nullable=true)
-	private String img1;
-	@Column(nullable=true)
+	@Column(nullable=false)
+	private String img1; //한개는 무조건 들어가야 하고 나머지 두개는 있어도 되고 없어도 됨.
+	
 	private String img2;
-	@Column(nullable=true)
+
 	private String img3;
 	
 	@PrePersist
 	public void preprocess() { // 디폴트 값 : 0
 		btnlike = 0;
+		
+		//삭제
 		//btngood = 0; 
 		//btnwhat = 0;
-		btnsad = 0;
+		//btnsad = 0;
 	}
 }

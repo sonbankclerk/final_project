@@ -1,23 +1,19 @@
-package com.example.demo.report;
+package com.example.demo.likebnt;
 
 import com.example.demo.community.Ocommunity;
 import com.example.demo.member.Omember;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OreportDto {
-	
-	private int repnum;
-	private Omember memnum;
+public class OlikebtnDto {
+
+	private int likebtn;
 	private Ocommunity commnum;
-	private String category;
-	
+	private Omember memnum;
+
 }
