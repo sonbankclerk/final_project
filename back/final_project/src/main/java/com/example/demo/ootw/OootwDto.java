@@ -21,5 +21,5 @@ public class OootwDto {
 	private Date odate;
 	private String weather;
 	private double temp;
-	private String comment;
+	private String comments;
 }

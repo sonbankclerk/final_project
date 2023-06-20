@@ -46,5 +46,5 @@ public class Oootw {
 	private String weather;
 	private double temp;
 	@Column(nullable = true)
-	private String comment;
+	private String comments;
 }

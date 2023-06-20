@@ -14,6 +14,6 @@ import jakarta.transaction.Transactional;
 public interface OootwDao extends JpaRepository<Oootw, Integer> {
 	
 	// 날짜 범위로 검색해서 리스트 뿌리기
-	ArrayList<Oootw> findByDateBetween(Date odate1, Date odate2);
+	ArrayList<Oootw> findByOdateBetween(Date odate1, Date odate2);
 	
 }
