@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,11 +37,44 @@ public class ObattleController {
 	@Value("${spring.servlet.multipart.location}")
 	private String basepath;
 	
+	// 테마 바꾸기
+	@PutMapping("/manager")
+	public Map updateTheme(String theme) {
+		Map map = new HashMap<>();
+		boolean flag = true;
+		try {
+			service.updateTheme(theme);
+		}catch(Exception e) {
+			e.printStackTrace();
+			flag = false;
+		}
+		map.put("flag", flag);
+		return map;
+	}
+	
+	
+	// 그 주의 테마 얻기.
+	@GetMapping("/theme")
+	public Map showTheme() {
+		Map map = new HashMap<>();
+		boolean flag = true;
+		try {
+			// manager는 1
+			String theme = service.findById(1).getTheme();
+			map.put("theme", theme);			
+		}catch(Exception e) {
+			e.printStackTrace();
+			flag = false;
+		}
+		map.put("flag", flag);
+		return map;
+	}
+	
 	// 신청하기.
 	@PostMapping("")
 	public Map save(ObattleDto dto, MultipartFile mf) {
 		Map map = new HashMap<>();
-		boolean tf = true;
+		boolean flag = true;
 		try {
 			// dto 저장 후.
 			
@@ -60,11 +94,11 @@ public class ObattleController {
 			map.put("dto", result);
 		}catch(Exception e) {
 			e.printStackTrace();
-			tf = false;
+			flag = false;
 		}
 		
 		// 어떠한 이유(에러)로 안될 수도 있으니 값을 넣어서 반환한다.
-		map.put("tf", tf);
+		map.put("flag", flag);
 		return map;
 	}
 
@@ -83,7 +117,7 @@ public class ObattleController {
 	@DeleteMapping("/manager/random")
 	public Map deleteRandom(int[] arr) {
 		Map map = new HashMap<>();
-		boolean tf = true;
+		boolean flag = true;
 		try {
 			// 후보 두명이 들어간 배열에서 한 명씩 뽑는다.
 			int num1 = arr[0];
@@ -103,10 +137,10 @@ public class ObattleController {
 			service.deleteNotCandidates(num1, num2);
 		}catch (Exception e) {
 			e.printStackTrace();
-			tf = false;
+			flag = false;
 		}
 		
-		map.put("tf", tf);
+		map.put("flag", flag);
 		return map;
 	}
 	
@@ -114,15 +148,15 @@ public class ObattleController {
 	@GetMapping("")
 	public Map listCandidate() {
 		Map map = new HashMap<>();
-		boolean tf = true;
+		boolean flag = true;
 		try {
 			ArrayList<ObattleDto> list = service.listCandidates();
 			map.put("list", list);
 		}catch(Exception e) {
 			e.printStackTrace();
-			tf = false;
+			flag = false;
 		}
-		map.put("tf", tf);
+		map.put("flag", flag);
 		return map;
 	}
 	
@@ -130,7 +164,7 @@ public class ObattleController {
 	@PostMapping("/{num}")
 	public Map upCnt(@PathParam("num") int num) {
 		Map map = new HashMap<>();
-		boolean tf = true;
+		boolean flag = true;
 		try {
 			// 투표 수 늘린 후.
 			service.upCnt(num);
@@ -139,9 +173,9 @@ public class ObattleController {
 			map.put("list", list);
 		}catch(Exception e) {
 			e.printStackTrace();
-			tf = false;
+			flag = false;
 		}
-		map.put("tf", tf);
+		map.put("flag", flag);
 		return map;
 	}
 	
@@ -149,15 +183,15 @@ public class ObattleController {
 	@GetMapping("/winner")
 	public Map findWinner() {
 		Map map = new HashMap<>();
-		boolean tf = true;
+		boolean flag = true;
 		try {
 			ObattleDto dto = service.findWinner();
 			map.put("dto", dto);
 		}catch(Exception e) {
 			e.printStackTrace();
-			tf = false;
+			flag = false;
 		}
-		map.put("tf", tf);
+		map.put("flag", flag);
 		return map;
 	}
 
@@ -165,15 +199,15 @@ public class ObattleController {
 	@GetMapping("/winnerlist")
 	public Map winnerList() {
 		Map map = new HashMap<>();
-		boolean tf = true;
+		boolean flag = true;
 		try {
 			ArrayList<ObattleDto> list = service.winnerList();
 			map.put("list", list);
 		}catch(Exception e) {
 			e.printStackTrace();
-			tf = false;
+			flag = false;
 		}
-		map.put("tf", tf);
+		map.put("flag", flag);
 		return map;
 	}
 	

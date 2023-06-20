@@ -43,8 +43,18 @@ public class ObattleService {
 	
 	// --------------------- * service start * -----------------------------------
 
+	// 관계자가 테마 바꾸기.
+	public void updateTheme(String theme) {
+		dao.updateTheme(theme);
+	}
+	
 	// 투표될 후보 추가.
 	public ObattleDto save(ObattleDto dto) {
+		// 최대 라운드 수 찾고 + 1 하기
+		int roundcnt = dao.findMaxRoundcnt().getRoundcnt()+1;
+		// roundcnt 설정하기.
+		dto.setRoundcnt(roundcnt);
+		
 		Obattle vo = (Obattle)change(dto);
 		ObattleDto result = (ObattleDto)change(dao.save(vo));
 		return result;
@@ -55,14 +65,14 @@ public class ObattleService {
 		dao.upCnt(num);
 	}
 	
-	// 투표 후보들 두명 뽑기
+	// 투표 후보들 두명 뽑기 ( 미확정 )
 	public ArrayList<ObattleDto> findCandidates(){
 		// 랜덤으로 두명 뽑기.
 		ArrayList<Obattle> list = dao.findCandidates();
 		return changeList(list);
 	}
 	
-	// 투표 후보 두명 보여주기
+	// 투표 후보 두명 보여주기 ( 확정된 후 )
 	public ArrayList<ObattleDto> listCandidates(){
 		ArrayList<Obattle> list = dao.listCandidates();
 		return changeList(list);
@@ -96,6 +106,7 @@ public class ObattleService {
 	}
 	
 	// 후보 두명을 제외한 나머지 신청자들 목록
+	// 파일 삭제용.
 	public ArrayList<ObattleDto> listNotCandidates(int num1, int num2){
 		ArrayList<Obattle> list = dao.listNotCandidates(num1, num2);
 		return changeList(list);

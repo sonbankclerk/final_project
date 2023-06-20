@@ -72,7 +72,7 @@ public class OmemberController {
 	public Map login(String id, String pwd) {
 		Map map = new HashMap();
 		boolean flag = false;
-		OmemberDto dto = service.getMember(id);
+		OmemberDto dto = service.getById(id);
 		if(dto!=null && pwd.equals(dto.getPwd())) {
 			String token = tokenprovider.generateJwtToken(dto);
 			flag = true;
@@ -89,8 +89,8 @@ public class OmemberController {
 		Map map = new HashMap();
 		if(token != null) {
 			try {
-				String id = tokenprovider.getUsernameFromToken(token);
-				if(!id.equals(dto.getId())) {
+				int memnum = tokenprovider.getMemnumFromToken(token);
+				if(memnum != dto.getMemnum()) {
 					flag = false;
 				}
 			}catch(Exception e) {
@@ -98,7 +98,7 @@ public class OmemberController {
 			}
 		}
 		if(flag) {
-			OmemberDto old = service.getMember(dto.getId());
+			OmemberDto old = service.getByMemnum(dto.getMemnum());
 			old.setPwd(dto.getPwd());
 			old.setNickname(dto.getNickname());
 			OmemberDto d = service.save(old);
@@ -109,14 +109,14 @@ public class OmemberController {
 	}
 	
 	//탈퇴
-	@DeleteMapping("/{id}")
-	public Map del(@PathVariable("id") String id, @RequestHeader(name= "token", required = false) String token) {
+	@DeleteMapping("/{memnum}")
+	public Map del(@PathVariable("memnum") int memnum, @RequestHeader(name= "token", required = false) String token) {
 		boolean flag = true;
 		Map map = new HashMap();
 		if (token != null) {
 			try {
-				String id2 = tokenprovider.getUsernameFromToken(token);
-				if(!id.equals(id2)) {
+				int tempMemnum = tokenprovider.getMemnumFromToken(token);
+				if(memnum != tempMemnum) {
 					flag = false;
 				}
 			}	catch(Exception e) {
@@ -124,31 +124,47 @@ public class OmemberController {
 			}
 		}
 		if(flag) {
-			OmemberDto dto = service.getById(id);
-			service.delMember(dto.getMemnum());
+			service.delMember(memnum);
 		}
 		map.put("flag",flag);
 		return map;
 	}
 	
 	//이미지파일 읽어오기
-		@GetMapping("/imgs/{memnum}")
-		public ResponseEntity<byte[]> readImg(@PathVariable("memnum") int memnum) {
-			String fname = "";
-			OmemberDto dto = service.getByMemnum(memnum);
-			fname = dto.getImg();
-			
-			ResponseEntity<byte[]> result = null;
-			try {
-				if(fname != null && fname.length() != 0) {
-					File f = new File(fname);
-					HttpHeaders header = new HttpHeaders();
-					header.add("Content-Type", Files.probeContentType(f.toPath()));
-					result = new ResponseEntity<byte[]> (FileCopyUtils.copyToByteArray(f), header, HttpStatus.OK);
-				}
-			}catch(IOException e) {
-				e.printStackTrace();
+	@GetMapping("/imgs/{memnum}")
+	public ResponseEntity<byte[]> readImg(@PathVariable("memnum") int memnum) {
+		String fname = "";
+		OmemberDto dto = service.getByMemnum(memnum);
+		fname = dto.getImg();
+		
+		ResponseEntity<byte[]> result = null;
+		try {
+			if(fname != null && fname.length() != 0) {
+				File f = new File(fname);
+				HttpHeaders header = new HttpHeaders();
+				header.add("Content-Type", Files.probeContentType(f.toPath()));
+				result = new ResponseEntity<byte[]> (FileCopyUtils.copyToByteArray(f), header, HttpStatus.OK);
 			}
-			return result;
+		}catch(IOException e) {
+			e.printStackTrace();
 		}
+		return result;
+	}
+	
+
+	// 내 정보 보기.
+	@GetMapping("/{memnum}")
+	public Map get(@PathVariable("memnum") int memnum, @RequestHeader(name= "token", required = false) String token) {
+		Map map = new HashMap();
+		boolean flag = true;
+		try {
+			OmemberDto dto = service.getByMemnum(memnum);
+			map.put("dto", dto);
+		}catch (Exception e) {
+			e.printStackTrace();
+			flag = false;
+		}
+		map.put("flag", flag);
+		return map;
+	}
 }

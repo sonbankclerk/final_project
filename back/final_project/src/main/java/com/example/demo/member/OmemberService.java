@@ -47,23 +47,17 @@ public class OmemberService {
 		return (OmemberDto)change(entity);
 	}
 	
-	// 로그인, 내정보확인
-	public OmemberDto getMember(String id) {
-		Omember m = dao.findById(id);
-		if(m==null) {
-			return null;
-		}
-		return (OmemberDto)change(m);
-	}
-	
 	// 탈퇴
 	public void delMember(int memnum) {
 		dao.deleteById(memnum);
 	}
 	
-	// 아이디 유무 검색
+	// 로그인, 아이디 유무 검색
 	public OmemberDto getById(String id) {
 		Omember m = dao.findById(id);
+		if(m==null) {
+			return null;
+		}
 		return (OmemberDto)change(m);
 	}
 	
