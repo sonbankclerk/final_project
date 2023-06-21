@@ -168,9 +168,10 @@ public class ObattleController {
 	}
 	
 	// 투표시 vote = vote + 1
-	@PostMapping("/{num}")
-	public Map upCnt(@PathParam("num") int num) {
+	@PutMapping("/vote")
+	public Map upCnt(int num) {
 		Map map = new HashMap<>();
+		System.out.println(num);
 		boolean flag = true;
 		try {
 			// 투표 수 늘린 후.

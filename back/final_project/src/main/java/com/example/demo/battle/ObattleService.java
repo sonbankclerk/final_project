@@ -46,7 +46,8 @@ public class ObattleService {
 	// 관계자가 테마 바꾸기.
 	public void updateTheme(String theme) {
 		int roundcnt = upRoundCnt();
-		
+		System.out.println("theme : " + theme);
+		System.out.println("roundcnt : " + roundcnt);
 		dao.updateTheme(theme,roundcnt);
 	}
 	
@@ -60,11 +61,12 @@ public class ObattleService {
 	// 변경될 라운드 수 알려주기.
 	private int upRoundCnt() {
 		// 최대 라운드 수 찾고 + 1 하기
-		Obattle vo = dao.findMaxRoundcnt();
-		if(vo == null) {
+		ArrayList<Obattle> list = (ArrayList<Obattle>)dao.findMaxRoundcnt();
+		System.out.println(list);
+		if(list == null || list.size() == 0) {
 			return 1;
 		}else {
-			int roundcnt = vo.getRoundcnt() + 1;
+			int roundcnt = list.get(0).getRoundcnt() + 1;
 			return roundcnt;
 		}
 	}
@@ -83,25 +85,27 @@ public class ObattleService {
 	// 투표 후보들 두명 뽑기 ( 미확정 )
 	public ArrayList<ObattleDto> findCandidates(){
 		// 랜덤으로 두명 뽑기.
-		ArrayList<Obattle> list = dao.findCandidates();
+		ArrayList<Obattle> list = (ArrayList<Obattle>)dao.findCandidates();
 		return changeList(list);
 	}
 	
 	// 투표 후보 두명 보여주기 ( 확정된 후 )
 	public ArrayList<ObattleDto> listCandidates(){
-		ArrayList<Obattle> list = dao.listCandidates();
+		ArrayList<Obattle> list = (ArrayList<Obattle>)dao.listCandidates();
 		return changeList(list);
 	}
 	
 	// 투표 완료 후 winner 뽑기.
 	public ObattleDto findWinner() {
 		// winner 뽑고
-		Obattle vo = dao.findWinner();
+		ArrayList<Obattle> list = (ArrayList<Obattle>)dao.findWinner();
+		System.out.println("list : " + list);
+		System.out.println(list.get(0).getBatnum());
 		// winner 명예의 전당에 올리기.
-		dao.changeWinner(vo.getBatnum());
+		dao.changeWinner(list.get(0).getBatnum());
 		// 패자 삭제
 		dao.deleteLoser();
-		return (ObattleDto)change(vo);
+		return (ObattleDto)change(list.get(0));
 	}
 
 	// 랜덤으로 뽑은 두 후보가 확정된 후 나머지 신청자들 삭제.
@@ -111,7 +115,7 @@ public class ObattleService {
 	
 	// 명예의 전당 리스트 뽑기.
 	public ArrayList<ObattleDto> winnerList(){
-		ArrayList<Obattle> list = dao.winnerList();
+		ArrayList<Obattle> list = (ArrayList<Obattle>)dao.winnerList();
 		return changeList(list);
 	}
 	
@@ -123,7 +127,7 @@ public class ObattleService {
 	// 후보 두명을 제외한 나머지 신청자들 목록
 	// 파일 삭제용.
 	public ArrayList<ObattleDto> listNotCandidates(int num1, int num2){
-		ArrayList<Obattle> list = dao.listNotCandidates(num1, num2);
+		ArrayList<Obattle> list = (ArrayList<Obattle>)dao.listNotCandidates(num1, num2);
 		return changeList(list);
 	}
 }
