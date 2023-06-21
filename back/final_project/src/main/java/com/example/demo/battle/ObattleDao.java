@@ -10,18 +10,19 @@ import org.springframework.stereotype.Repository;
 public interface ObattleDao extends JpaRepository<Obattle, Integer>{
 	
 	// 관계자가 테마 바꾸기.
-	@Query(value = "update obattle set theme = :theme"
+	// 관계자 roundcnt 바꾸기.
+	// 현재 관계자의 roundcnt가 곧 현재의 roundcnt이다.
+	@Query(value = "update obattle set theme = :theme and roundcnt = :roundcnt"
 				 + "where memnum = 1",nativeQuery = true)
-	void updateTheme(String theme);
+	void updateTheme(String theme,int roundcnt);
 
 	// 신청자 올리기 전에 roundcnt올리기위한 max(roundcnt)찾기
 	@Query(value = "select * "
 				 + "from obattle"
 				 + "where roundcnt = (select max(roundcnt)"
-				 					+ "from obattle", nativeQuery = true)
+				 					+ "from obattle"
+				 					+ "where winners = 1 and batnum != 1)", nativeQuery = true)
 	Obattle findMaxRoundcnt();
-	
-	
 	
 	// 투표 수 추가.
 	@Query(value = "update obattle set vote = vote + 1"

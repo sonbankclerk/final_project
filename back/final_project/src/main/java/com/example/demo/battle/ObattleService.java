@@ -45,19 +45,34 @@ public class ObattleService {
 
 	// 관계자가 테마 바꾸기.
 	public void updateTheme(String theme) {
-		dao.updateTheme(theme);
+		int roundcnt = upRoundCnt();
+		
+		dao.updateTheme(theme,roundcnt);
 	}
 	
 	// 투표될 후보 추가.
 	public ObattleDto save(ObattleDto dto) {
-		// 최대 라운드 수 찾고 + 1 하기
-		int roundcnt = dao.findMaxRoundcnt().getRoundcnt()+1;
-		// roundcnt 설정하기.
-		dto.setRoundcnt(roundcnt);
-		
 		Obattle vo = (Obattle)change(dto);
 		ObattleDto result = (ObattleDto)change(dao.save(vo));
 		return result;
+	}
+	
+	// 변경될 라운드 수 알려주기.
+	private int upRoundCnt() {
+		// 최대 라운드 수 찾고 + 1 하기
+		Obattle vo = dao.findMaxRoundcnt();
+		if(vo == null) {
+			return 1;
+		}else {
+			int roundcnt = vo.getRoundcnt() + 1;
+			return roundcnt;
+		}
+	}
+	
+	// 현재 라운드 수 확인하기.
+	public int findRoundCnt() {
+		Obattle vo = dao.findById(1).orElse(null);
+		return vo.getRoundcnt();
 	}
 	
 	// 투표 시 vote = vote + 1 
