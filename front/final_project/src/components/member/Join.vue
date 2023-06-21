@@ -40,7 +40,7 @@ export default{
             const file = document.getElementById('f1')
             formdata.append('mf', file.files[0]);
 
-            self.$axios.post('http://localhost:8082/members', formdata,
+            self.$axios.post('http://localhost:8081/members', formdata,
             { headers: { "Content-Type": "multipart/form-data" } })
             .then(function(res){
                 if(res.status == 200){

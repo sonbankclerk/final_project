@@ -2,6 +2,7 @@ package com.example.demo.member;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -43,11 +44,12 @@ public class OmemberController {
 	//가입, 이미지업로드
 	@PostMapping("")
 	public Map join( @RequestParam("mf")  MultipartFile mf,OmemberDto dto) {
-		OmemberDto d = service.save(dto);
+//		OmemberDto d = service.save(dto);
 		Map map = new HashMap();
 		boolean flag = true;
 		try {
-			File dir = new File(path+d.getMemnum());
+			dto = service.save(dto);
+			File dir = new File(path+dto.getMemnum());
 			dir.mkdir();
 			
 			String fname = mf.getOriginalFilename();
@@ -58,14 +60,14 @@ public class OmemberController {
 			
 			dto.setImg(URLEncoder.encode(newpath, "utf-8"));
 			OmemberDto result = service.save(dto);
-			map.put("dto", result);
+			map.put("result", result);
 		}catch(Exception e) {
 			e.printStackTrace();
 			flag = false;
 		}
 		
 		map.put("flag", flag);
-		map.put("dto", d);
+		map.put("dto", dto);
 		return map;
 	}
 	
@@ -144,6 +146,7 @@ public class OmemberController {
 		ResponseEntity<byte[]> result = null;
 		try {
 			if(fname != null && fname.length() != 0) {
+				fname = URLDecoder.decode(fname,"utf-8");
 				File f = new File(fname);
 				HttpHeaders header = new HttpHeaders();
 				header.add("Content-Type", Files.probeContentType(f.toPath()));
