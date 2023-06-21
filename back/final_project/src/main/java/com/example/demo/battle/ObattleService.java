@@ -48,7 +48,7 @@ public class ObattleService {
 		int roundcnt = upRoundCnt();
 		System.out.println("theme : " + theme);
 		System.out.println("roundcnt : " + roundcnt);
-		dao.updateTheme(theme,roundcnt);
+		dao.updateTheme(theme,(long)roundcnt);
 	}
 	
 	// 투표될 후보 추가.
@@ -78,7 +78,7 @@ public class ObattleService {
 	}
 	
 	// 투표 시 vote = vote + 1 
-	public void upCnt(int num) {
+	public void upCnt(long num) {
 		dao.upCnt(num);
 	}
 	
@@ -99,17 +99,24 @@ public class ObattleService {
 	public ObattleDto findWinner() {
 		// winner 뽑고
 		ArrayList<Obattle> list = (ArrayList<Obattle>)dao.findWinner();
+		ObattleDto dto = null;
+		if(list.size() != 0) {
+			dto = (ObattleDto)change(list.get(0));
+			// winner 명예의 전당에 올리기.
+			dao.changeWinner((long)dto.getBatnum());
+			// 패자 삭제
+			dao.deleteLoser();
+			System.out.println("listSize : " + "not 0");
+		}
+		list = (ArrayList<Obattle>)dao.winnerList();
+		dto = (ObattleDto)change(list.get(0));
+		System.out.println("listSize : " + "0");
 		System.out.println("list : " + list);
-		System.out.println(list.get(0).getBatnum());
-		// winner 명예의 전당에 올리기.
-		dao.changeWinner(list.get(0).getBatnum());
-		// 패자 삭제
-		dao.deleteLoser();
-		return (ObattleDto)change(list.get(0));
+		return dto;
 	}
 
 	// 랜덤으로 뽑은 두 후보가 확정된 후 나머지 신청자들 삭제.
-	public void deleteNotCandidates(int num1, int num2) {
+	public void deleteNotCandidates(long num1, long num2) {
 		dao.deleteNotCandidates(num1, num2);
 	}
 	
@@ -121,12 +128,18 @@ public class ObattleService {
 	
 	// dto 한명 보여주기
 	public ObattleDto findById(int num) {
-		return (ObattleDto)change(dao.findById(num));
+		Obattle vo = dao.findById(num).orElse(null);
+		System.out.println(vo);
+		if(vo == null) {
+			return null;
+		}else {
+			return (ObattleDto)change(vo);
+		}
 	}
 	
 	// 후보 두명을 제외한 나머지 신청자들 목록
 	// 파일 삭제용.
-	public ArrayList<ObattleDto> listNotCandidates(int num1, int num2){
+	public ArrayList<ObattleDto> listNotCandidates(long num1, long num2){
 		ArrayList<Obattle> list = (ArrayList<Obattle>)dao.listNotCandidates(num1, num2);
 		return changeList(list);
 	}

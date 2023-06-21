@@ -9,6 +9,7 @@
 
 <script>
 export default {
+  name : 'battleApply',
   data(){
     return{
       theme:'',
@@ -22,7 +23,7 @@ export default {
     const self = this;
     
     // dto 로그인 정보로 저장하기.
-    self.$axios.get(`http://localhost:8081/members/${memnum}`)
+    self.$axios.get(`http://localhost:8081/members/${this.memnum}`)
     .then(res =>{
       if(res.status == 200 || res.data.flag){
         this.dto = res.data.dto;
@@ -31,10 +32,6 @@ export default {
         alert("오류 발생으로 인한 로그인 정보 불러오기 실패");
       }
     })
-    .catch(error => {
-      console.log(error);
-      alert("오류 발생으로 인한 로그인 정보 불러오기 실패")
-    });
   
 
     // 대결 테마 들고 오기.
@@ -47,10 +44,6 @@ export default {
         alert("오류 발생으로 인한 테마 정보 불러오기 실패");
       }
     })
-    .catch(error =>{
-      alert("오류 발생으로 인한 테마 정보 불러오기 실패");
-    })
-    
     
   },
   methods:{
@@ -76,10 +69,6 @@ export default {
         }else{
           alert("오류 발생으로 인한 신청 실패")
         }
-      })
-      .catch(error =>{
-        console.log(error);
-        alert("오류 발생으로 인한 신청 실패")
       })
     }
   }

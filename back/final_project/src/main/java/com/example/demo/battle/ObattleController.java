@@ -17,6 +17,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -39,7 +40,7 @@ public class ObattleController {
 	private String basepath;
 	
 	// 테마 바꾸기
-	@PutMapping("/manager")
+	@PatchMapping("/manager")
 	public Map updateTheme(String theme) {
 		Map map = new HashMap<>();
 		boolean flag = true;
