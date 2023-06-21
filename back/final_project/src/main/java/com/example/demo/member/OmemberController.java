@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,17 +42,18 @@ public class OmemberController {
 	
 	//가입, 이미지업로드
 	@PostMapping("")
-	public Map join(OmemberDto dto, MultipartFile mf) {
+	public Map join( @RequestParam("mf")  MultipartFile mf,OmemberDto dto) {
 		OmemberDto d = service.save(dto);
 		Map map = new HashMap();
 		boolean flag = true;
 		try {
-			File dir = new File(path+dto.getMemnum());
+			File dir = new File(path+d.getMemnum());
 			dir.mkdir();
 			
 			String fname = mf.getOriginalFilename();
 			String newpath = dir.getAbsolutePath()+"\\"+fname;
 			File newFile = new File(newpath);
+
 			mf.transferTo(newFile);
 			
 			dto.setImg(URLEncoder.encode(newpath, "utf-8"));
@@ -76,6 +78,8 @@ public class OmemberController {
 		if(dto!=null && pwd.equals(dto.getPwd())) {
 			String token = tokenprovider.generateJwtToken(dto);
 			flag = true;
+			
+			map.put("memnum", dto.getMemnum());
 			map.put("token", token);
 		}
 		map.put("flag", flag);
