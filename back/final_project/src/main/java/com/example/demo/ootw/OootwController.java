@@ -28,12 +28,20 @@ public class OootwController {
 	
 	// 게시글 작성.. POST
 	@PostMapping("")
-	public Map add(OootwDto dto1, OootwimgsDto dto2) {
+	public Map add(OootwDto dto1, ArrayList<OootwimgsDto> dto2) {
+		// oootwdto = "ootwnum", memnum, odate, weather, temp, comments
+		// oootwimgsdto = ootwimgsnum, "ootwnum", closetnum
+		System.out.println("dto1: " + dto1);
+		System.out.println("dto2: " + dto2); // postman에서 값 못받아오네 흠..
 		OootwDto odto1 = service.save(dto1); // 옷장 이미지 정보 제외한 것들 저장
-		OootwimgsDto odto2 = imgservice.save(dto2); // 옷장 이미지 정보 저장
+		ArrayList<OootwimgsDto> odto2list = new ArrayList<>();
+		for(OootwimgsDto listdto : dto2) {
+			OootwimgsDto odto2 = imgservice.save(listdto); // 옷장 이미지 정보 저장
+			odto2list.add(odto2);
+		}
 		Map map = new HashMap<>();
 		map.put("dto1", odto1);
-		map.put("dto2", odto2);
+		map.put("dto2", odto2list);
 		return map;
 	}
 	
@@ -42,14 +50,15 @@ public class OootwController {
 	public Map getByNum(@PathVariable("ootwnum") int ootwnum) {
 		OootwDto dto = service.getMyBoard(ootwnum);
 		ArrayList<OootwimgsDto> list = imgservice.getMyImgs(ootwnum); // 게시글 번호(ootwnum)로 옷장 정보(..closetnum) 불러와서 담기
+		System.out.println(list);
 		Map map = new HashMap<>();
 		map.put("dto", dto);
-		map.put("list", list); // ootwimgsnum, ootwnum, closetnum.. 담아서 보내는데 vue에서 closetnum만 잘 꺼내서 쓸 수 있을까?
+		map.put("list", list); // vue에서 list.closetnum.closetnum으로 closetnum 뽑아서 옷장 img src 뿌리기
 		// vue created:function에서 list for문 돌리고, closetnum 있는만큼 뽑아서 closet controller에서 img src 뽑아오기
 		return map;
 	}
 	
-	// 전체 리스트 뿌리기.. GET
+	// 전체 리스트 뿌리기.. 전체 리스트는 이미지 없이 보여줄거임 GET
 	@GetMapping("")
 	public Map getAll() {
 		ArrayList<OootwDto> list = service.getAll();
@@ -61,6 +70,8 @@ public class OootwController {
 	// 날짜 검색 리스트 뿌리기.. GET(/dates/odate)
 	@GetMapping("/dates/{odate1}/{odate2}")
 	public Map getByDate(@PathVariable("odate1") Date odate1, @PathVariable("odate2") Date odate2) {
+		System.out.println(odate1);
+		System.out.println(odate2);
 		ArrayList<OootwDto> list = service.getByDateBetween(odate1, odate2);
 		Map map = new HashMap<>();
 		map.put("list", list);

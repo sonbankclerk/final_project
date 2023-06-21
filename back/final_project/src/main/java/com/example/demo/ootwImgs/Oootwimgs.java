@@ -31,10 +31,13 @@ public class Oootwimgs {
 	@SequenceGenerator(name="seq_ootwimg", sequenceName="seq_ootwimg", allocationSize=1)
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq_ootwimg")
 	private int ootwimgsnum;
+
 	@ManyToOne
 	@JoinColumn(name="ootwnum", nullable=false)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Oootw ootwnum;
+//	int ootwnum;
+	
 	@ManyToOne
 	@JoinColumn(name="closetnum", nullable=false)
 	@OnDelete(action = OnDeleteAction.CASCADE)
