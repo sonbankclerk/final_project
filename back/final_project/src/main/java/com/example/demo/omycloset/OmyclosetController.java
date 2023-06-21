@@ -36,6 +36,7 @@ public class OmyclosetController {
 	// 옷장에 옷 등록하기(POST)
 	@PostMapping("")
 	public Map addCloth(OmyclosetDto dto) {
+		System.out.println(dto);
 		boolean flag = true;
 		OmyclosetDto dto2;
 		try {
