@@ -1,6 +1,5 @@
 package com.example.demo.bookmark;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,16 +20,23 @@ public class ObookmarkController {
 	@Autowired
 	private ObookmarkService service;
 
-	// 전체목록 검색
-	@GetMapping("")
-	public Map getAll() {
-		ArrayList<ObookmarkDto> list = service.getAll();
-		Map map = new HashMap();
-		map.put(list, list);
+	//회원번호로 북마크 리스트 검색
+	@GetMapping("/{memnum}")
+	public Map getByMemnum(@PathVariable("memnum") int memnum) {
+		Map map = new HashMap<>();
+		boolean flag = true;
+		try {
+			ObookmarkDto dto = service.getByMemnum(memnum);
+			map.put("dto", dto);
+		} catch (Exception e) {
+			e.printStackTrace();
+			flag = false;
+		}
+		map.put("flag", flag);
 		return map;
 	}
-	
-	//북마크 추가
+
+	// 북마크 추가
 	@PostMapping("")
 	public Map save(ObookmarkDto dto) {
 		Map map = new HashMap<>();
@@ -38,7 +44,7 @@ public class ObookmarkController {
 		try {
 			ObookmarkDto result = service.save(dto);
 			map.put("dto", result);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			flag = false;
 		}

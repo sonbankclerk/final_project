@@ -51,5 +51,8 @@ public class OlikebtnService {
 			dao.deleteById(likenum);
 		}
 		
-		
+		//좋아요 cnt list
+		public int likeCount(int commnum) {
+			return dao.likeCount(commnum).get(0);
+		}
 }

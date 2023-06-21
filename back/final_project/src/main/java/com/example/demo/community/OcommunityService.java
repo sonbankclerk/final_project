@@ -58,6 +58,12 @@ public class OcommunityService {
 		return list2;
 	}
 	
+	//회원번호로 검색
+//	public OcommunityDto getByMemnum(int memnum) {
+//		Ocommunity entity = dao.findById(memnum).orElse(null);
+//		return (OcommunityDto) change(entity);
+//	}
+	
 	//게시글 번호로 검색
 	public OcommunityDto getByCommnum(int commnum) {
 		Ocommunity entity = dao.findById(commnum).orElse(null);

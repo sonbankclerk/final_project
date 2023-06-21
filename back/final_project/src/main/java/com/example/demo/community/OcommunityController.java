@@ -23,16 +23,18 @@ import com.example.demo.member.Omember;
 import com.example.demo.member.OmemberDto;
 import com.example.demo.member.OmemberService;
 
+import io.jsonwebtoken.io.IOException;
+
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/ocommunity")
 public class OcommunityController {
 	@Autowired
 	private OcommunityService service;
-	
+
 	@Autowired
-	private OlikebtnService likeservice; //좋아요 누적
-	
+	private OlikebtnService likeservice; // 좋아요 누적
+
 	@Value("${spring.servlet.multipart.location}")
 	private String path; // C:/comm/
 
@@ -44,8 +46,24 @@ public class OcommunityController {
 		map.put("list", list);
 		return map;
 	}
+
+//	// 멤버로 검색
+//	@GetMapping("/memnum/{memnum}")
+//	public Map getByMemnum(@PathVariable("memnum") int memnum) {
+//		Map map = new HashMap<>();
+//		boolean flag = true;
+//		try {
+//			OcommunityDto dto = service.getByMemnum(memnum);
+//			map.put("dto", dto);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			flag = false;
+//		}
+//		map.put("flag", flag);
+//		return map;
+//	}
 	
-	//게시글 번호로 검색
+	// 게시글 번호로 검색
 	@GetMapping("/{commnum}")
 	public Map getByTag(@PathVariable("commnum") int commnum) {
 		Map map = new HashMap<>();
@@ -62,7 +80,7 @@ public class OcommunityController {
 	}
 
 	// 게시글 태그 검색
-	@GetMapping("/{tag}")
+	@GetMapping("/tags/{tag}")
 	public Map getByTag(@PathVariable("tag") String tag) {
 		Map map = new HashMap<>();
 		boolean flag = true;
@@ -98,8 +116,12 @@ public class OcommunityController {
 					String fname = mf.getOriginalFilename();
 					String newpath = dir.getAbsolutePath() + "//" + fname;
 					File newFile = new File(newpath);
-					mf.transferTo(newFile);
-					imgs[i] = newpath;
+					try {
+						mf.transferTo(newFile);
+						imgs[i] = newpath;
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 
@@ -118,12 +140,12 @@ public class OcommunityController {
 	}
 
 	// 게시물 삭제하기 ( 신고당했을 때도 이용하기 )
-	@DeleteMapping("")
-	public Map delOcommunity(int num) {
+	@DeleteMapping("/{commnum}")
+	public Map delOcommunity(@PathVariable("commnum") int commnum) {
 		Map map = new HashMap<>();
 		boolean flag = true;
 		try {
-			service.delOcommunity(num);
+			service.delOcommunity(commnum);
 		} catch (Exception e) {
 			e.printStackTrace();
 			flag = false;
@@ -131,23 +153,24 @@ public class OcommunityController {
 		map.put("flag", flag);
 		return map;
 	}
-	
-	//좋아요 부분 수정
+
+	// 좋아요 부분 수정
 	@PatchMapping("/{memnum}/{commnum}")
 	public Map likeUpAndDown(@PathVariable("memnum") int memnum, @PathVariable("communm") int commnum) {
+		Map map = new HashMap<>();
 		boolean flag = true;
 		OlikebtnDto dto = likeservice.getByMemnumAndCommnum(memnum, commnum);
-		if(dto == null) { // 좋아요 안누름
+		if (dto == null) { // 좋아요 안누름
 			service.upBtn(commnum);
 			likeservice.save(dto);
 		} else { // 좋아요 누름
 			service.downBtn(commnum);
 			likeservice.delOlikebtn(dto.getLikebtn());
-			flag = false; // 좋아요 눌려있으면 false 보내서 
+			flag = false; // 좋아요 눌려있으면 false 보내서
 		}
-		Map map = new HashMap<>();
 		map.put("flag", flag);
 		return map;
 	}
-	
+
+
 }

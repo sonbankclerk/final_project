@@ -5,10 +5,6 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.report.Oreport;
-import com.example.demo.report.OreportDto;
-
-
 @Service
 public class ObookmarkService {
 	@Autowired
@@ -17,7 +13,7 @@ public class ObookmarkService {
 	// dto vo 변경하기
 		private Object change(Object obj) {
 			// 매개변수의 클래스를 확인한다.
-			if(obj instanceof Oreport) {
+			if(obj instanceof Obookmark) {
 				// 만약 vo라면 temp에 vo클래스로 값을 넣어놓는다.
 				Obookmark temp = (Obookmark)obj;
 				// vo의 값들을 dto 생성자를 이용하여 새로 생긴 dto에 값을 기입해준 후 리턴한다.
@@ -50,16 +46,16 @@ public class ObookmarkService {
 			ObookmarkDto result = (ObookmarkDto)change(dao.save(bm));
 			return result;
 		}
-		
-		//북마크 리스트 전체검색
-		public ArrayList<ObookmarkDto> getAll(){
-			ArrayList<Obookmark> list = (ArrayList<Obookmark>) dao.findAll();
-			ArrayList<ObookmarkDto> list2 = changeList(list);
-			return list2;
+
+		//회원번호로 검색
+		public ObookmarkDto getByMemnum(int memnum) {
+			Obookmark entity = dao.findById(memnum).orElse(null);
+			return (ObookmarkDto) change(entity);
 		}
 		
 		//북마크 삭제
 		public void delOreport(int bmnum) {
 			dao.deleteById(bmnum);
 		}
+
 }

@@ -16,7 +16,7 @@ public interface OcommunityDao extends JpaRepository<Ocommunity, Integer> {
 	ArrayList<Ocommunity> findTop10ByOrderByBtnlikeDesc();
 	
 	//Omember - memnum으로 검색
-	ArrayList<Ocommunity> findByMemnum(Omember mb);
+	//ArrayList<Ocommunity> findByMemnum(Omember memnum);
 	
 	//태그별 검색
 	ArrayList<Ocommunity> findByTagLike(String tag);
