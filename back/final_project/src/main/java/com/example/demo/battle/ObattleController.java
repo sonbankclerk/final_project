@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +29,7 @@ import jakarta.websocket.server.PathParam;
 
 @RestController
 @CrossOrigin(origins ="*")
-@RequestMapping("/battle")
+@RequestMapping("/battles")
 public class ObattleController {
 	
 	@Autowired
@@ -53,15 +54,19 @@ public class ObattleController {
 	}
 	
 	
-	// 그 주의 테마 얻기.
-	@GetMapping("/theme")
+	// 그 주의 테마와 라운드 수 얻기.
+	@GetMapping("/info")
 	public Map showTheme() {
 		Map map = new HashMap<>();
 		boolean flag = true;
 		try {
-			// manager는 1
+			// manager는 1, 테마 얻기
 			String theme = service.findById(1).getTheme();
-			map.put("theme", theme);			
+			map.put("theme", theme);		
+			
+			// 라운드 수 얻기.
+			int roundcnt = service.findRoundCnt();
+			map.put("roundcnt", roundcnt);
 		}catch(Exception e) {
 			e.printStackTrace();
 			flag = false;
@@ -70,9 +75,10 @@ public class ObattleController {
 		return map;
 	}
 	
+	
 	// 신청하기.
 	@PostMapping("")
-	public Map save(ObattleDto dto, MultipartFile mf) {
+	public Map save(ObattleDto dto, @RequestParam("mf") MultipartFile mf) {
 		Map map = new HashMap<>();
 		boolean flag = true;
 		try {
@@ -152,6 +158,7 @@ public class ObattleController {
 		try {
 			ArrayList<ObattleDto> list = service.listCandidates();
 			map.put("list", list);
+			map.put("len",list.size());
 		}catch(Exception e) {
 			e.printStackTrace();
 			flag = false;
@@ -169,8 +176,8 @@ public class ObattleController {
 			// 투표 수 늘린 후.
 			service.upCnt(num);
 			// 투표 후보 두명 리스트.
-			ArrayList<ObattleDto> list = service.listCandidates();
-			map.put("list", list);
+			ObattleDto dto = service.findById(num);
+			map.put("dto", dto);
 		}catch(Exception e) {
 			e.printStackTrace();
 			flag = false;
@@ -203,6 +210,7 @@ public class ObattleController {
 		try {
 			ArrayList<ObattleDto> list = service.winnerList();
 			map.put("list", list);
+			map.put("dto", list.get(0));
 		}catch(Exception e) {
 			e.printStackTrace();
 			flag = false;
