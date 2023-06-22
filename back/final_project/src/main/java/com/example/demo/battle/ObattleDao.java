@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Repository
 public interface ObattleDao extends JpaRepository<Obattle, Integer>{
 	
@@ -88,4 +89,15 @@ public interface ObattleDao extends JpaRepository<Obattle, Integer>{
 				 + "where winners = 1 "
 				 + "order by roundcnt desc", nativeQuery = true)
 	List<Obattle> winnerList();
+
+	// winCount 세기.
+	@Transactional
+	@Query(value = "select * from obattle where winners = 1 and memnum = :memnum", nativeQuery = true)
+	List<Obattle> winCount(@Param(value = "memnum") int memnum);
+
+	// 신청 유무 확인하기.
+	@Transactional
+	@Query(value = "select * from obattle where winners = 0 and memnum = :memnum", nativeQuery = true)
+	List<Obattle> chkApply(@Param(value = "memnum") int memnum);
+	
 }

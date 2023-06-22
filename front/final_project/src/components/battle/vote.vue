@@ -1,6 +1,6 @@
 <template>
   <div v-if="!prepared">
-    투표를 준비 중 입니다.
+    <notYet></notYet>
   </div>
   <div v-else>
     <div @:click="voteCandidate(1)">
@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import notYet from '@/components/battle/notYet.vue'
+
 export default{
   name : 'battleVote',
   data(){
@@ -22,8 +24,11 @@ export default{
       memnum : sessionStorage.getItem("memnum"),
       firstCandidate:{},
       secondCandidate:{},
-      prepared : true
+      prepared : false
     }
+  },
+  components:{
+    notYet
   },
   created: function(){
     // 현재 로그인 상태 확인.

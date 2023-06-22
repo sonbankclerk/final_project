@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.demo.member.OmemberDto;
+
 import jakarta.websocket.server.PathParam;
 
 @RestController
@@ -40,7 +42,7 @@ public class ObattleController {
 	private String basepath;
 	
 	// 테마 바꾸기
-	@PatchMapping("/manager")
+	@PutMapping("/manager")
 	public Map updateTheme(String theme) {
 		Map map = new HashMap<>();
 		boolean flag = true;
@@ -112,9 +114,16 @@ public class ObattleController {
 	// 후보 두명 랜덤 뽑아서 보여주기.
 	@GetMapping("/manager/random")
 	public Map findCandidates() {
-		ArrayList<ObattleDto> list = service.findCandidates();
 		Map map = new HashMap<>();
-		map.put("list", list);
+		boolean flag = true;
+		try {
+			ArrayList<ObattleDto> list = service.findCandidates();
+			map.put("list", list);
+		}catch(Exception e) {
+			e.printStackTrace();
+			flag = false;
+		}
+		map.put("flag",flag);
 		return map;
 	}
 	
@@ -122,14 +131,10 @@ public class ObattleController {
 	// 랜덤으로 뽑은 두명을 후보로 확정하기.
 	// 두명을 제외한 신청자들을 삭제해야하므로 delete.
 	@DeleteMapping("/manager/random")
-	public Map deleteRandom(int[] arr) {
+	public Map deleteRandom(int num1, int num2) {
 		Map map = new HashMap<>();
 		boolean flag = true;
 		try {
-			// 후보 두명이 들어간 배열에서 한 명씩 뽑는다.
-			int num1 = arr[0];
-			int num2 = arr[1]; 
-			
 			// dir에 들어있는 이미지들을 삭제한다.
 			ArrayList<ObattleDto> list = service.listNotCandidates(num1, num2);
 			for(ObattleDto dto : list) {
@@ -212,7 +217,22 @@ public class ObattleController {
 		try {
 			ArrayList<ObattleDto> list = service.winnerList();
 			map.put("list", list);
-			map.put("dto", list.get(0));
+		}catch(Exception e) {
+			e.printStackTrace();
+			flag = false;
+		}
+		map.put("flag", flag);
+		return map;
+	}
+	
+	// wincount 세기
+	@GetMapping("/winCount/{memnum}")
+	public Map winCount(@PathVariable("memnum") int memnum) {
+		Map map = new HashMap<>();
+		boolean flag = true;
+		try {
+			int winCount = service.winCount(memnum);
+			map.put("winCount", winCount);
 		}catch(Exception e) {
 			e.printStackTrace();
 			flag = false;
