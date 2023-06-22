@@ -17,11 +17,11 @@ public class OmemberService {
 				// 만약 vo라면 temp에 vo클래스로 값을 넣어놓는다.
 				Omember temp = (Omember)obj;
 				// vo의 값들을 dto 생성자를 이용하여 새로 생긴 dto에 값을 기입해준 후 리턴한다.
-				return new OmemberDto(temp.getMemnum(),temp.getId(),temp.getPwd(),temp.getEmail(),temp.getGender(),temp.getNickname(),temp.getImg(),temp.getWincnt());
+				return new OmemberDto(temp.getMemnum(),temp.getId(),temp.getPwd(),temp.getEmail(),temp.getGender(),temp.getNickname(),temp.getImg());
 			}else {
 				// 반대로 한다.
 				OmemberDto temp = (OmemberDto) obj;
-				return new Omember(temp.getMemnum(),temp.getId(),temp.getPwd(),temp.getEmail(),temp.getGender(),temp.getNickname(),temp.getImg(),temp.getWincnt());
+				return new Omember(temp.getMemnum(),temp.getId(),temp.getPwd(),temp.getEmail(),temp.getGender(),temp.getNickname(),temp.getImg());
 			}
 		}
 		
@@ -69,4 +69,6 @@ public class OmemberService {
 		}
 		return (OmemberDto)change(m);
 	}
+	
+	
 }

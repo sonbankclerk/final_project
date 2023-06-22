@@ -1,7 +1,8 @@
 <template>
     <div id="myjoin">
         <h3>회원가입폼</h3>
-        id: <input type="text" v-model="id"> <br/>
+        id: <input type="text" v-model="id"> <button v-on:click="idcheck">중복체크</button><br/>
+        {{ msg }}<br/> 
         pwd: <input type="password" v-model="pwd"> <br/>
         email: <input type="text" v-model="email"><br/>
         gender: <select v-model="gender">
@@ -24,6 +25,7 @@ export default{
             email:'',
             gender:'',
             nickname:'',
+            msg:''
         }
     },
     methods:{
@@ -47,6 +49,22 @@ export default{
                     let dto = res.data.dto
                     alert(dto.id)
                     location.href='/'
+                }else{
+                    alert('에러코드:'+res.status)
+                }
+            });
+        },
+
+        idcheck(){
+            const self =this;
+            self.$axios.get('http://localhost:8081/members/check/'+self.id)
+            .then(function(res){
+                if(res.status == 200){
+                    if(res.data.tf){
+                        self.msg='사용가능한 아이디'
+                    }else{
+                        self.msg='중복된 아이디'
+                    }
                 }else{
                     alert('에러코드:'+res.status)
                 }
