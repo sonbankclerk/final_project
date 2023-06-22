@@ -38,6 +38,7 @@ public class Omember {
 	@Column(nullable=true)
 	private String img;
 	
-	@ColumnDefault("0") //default값 설정
-	private int wincnt;
+	
+//	@ColumnDefault("0") //default값 설정
+//	private int wincnt;
 }

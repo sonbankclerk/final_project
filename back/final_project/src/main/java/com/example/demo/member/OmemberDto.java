@@ -19,5 +19,5 @@ public class OmemberDto {
 	private String gender;
 	private String nickname;
 	private String img;
-	private int wincnt;
+//	private int wincnt;
 }
