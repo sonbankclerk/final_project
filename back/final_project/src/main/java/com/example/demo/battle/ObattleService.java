@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.member.OmemberDto;
+
 @Service
 public class ObattleService {
 	
@@ -100,7 +102,7 @@ public class ObattleService {
 		// winner 뽑고
 		ArrayList<Obattle> list = (ArrayList<Obattle>)dao.findWinner();
 		ObattleDto dto = null;
-		if(list.size() != 0) {
+		if(!list.isEmpty()) {
 			dto = (ObattleDto)change(list.get(0));
 			// winner 명예의 전당에 올리기.
 			dao.changeWinner((long)dto.getBatnum());
@@ -109,6 +111,9 @@ public class ObattleService {
 			System.out.println("listSize : " + "not 0");
 		}
 		list = (ArrayList<Obattle>)dao.winnerList();
+		if(list == null) {
+			return null;
+		}
 		dto = (ObattleDto)change(list.get(0));
 		System.out.println("listSize : " + "0");
 		System.out.println("list : " + list);
@@ -142,5 +147,19 @@ public class ObattleService {
 	public ArrayList<ObattleDto> listNotCandidates(long num1, long num2){
 		ArrayList<Obattle> list = (ArrayList<Obattle>)dao.listNotCandidates(num1, num2);
 		return changeList(list);
+	}
+	
+	// wincount 세기.
+	public int winCount(int memnum) {
+		ArrayList<Obattle> list = (ArrayList<Obattle>)dao.winCount(memnum);
+		return list.size();
+	}
+	
+	// 신청 유무 확인하기.
+	// 신청 유무 확인용.
+	public boolean chkApply(int memnum) {
+		ArrayList<Obattle> list = (ArrayList<Obattle>)dao.chkApply(memnum);
+		// true 신청 가능, false 이미 신청해서 신청 불가능.
+		return list.isEmpty();
 	}
 }

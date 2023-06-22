@@ -6,7 +6,7 @@ winnerList
     gender : {{ winner.gender }} |
     theme : {{ winner.theme }} |
     roundcnt : {{ winner.roundcnt }} |
-    img : {{ winner.img }} |
+    img : <img src="'http://localhost:8081/battles/imgs/' + winner.batnum" alt="이미지 불러오기 실패"> |
     vote : {{ winner.vote }} |
     winner : {{ winner.memnum }} 
   </div>
@@ -28,6 +28,7 @@ export default{
     .then(res =>{
       if(res.status == 200){
         this.list = res.data.list;
+        console.log(this.list);
       }else{
         alert("오류로 인해 명예의 전당 활성화 불가")
       }

@@ -3,8 +3,13 @@
   memnum : {{ memnum }}
   gender : {{ gender }}
   dto : {{ dto }}
-  <input type="file">
-  <button @:click="applyBattle">신청 하기</button>
+  <div v-if="chk">
+    <input type="file">
+    <button @:click="applyBattle">신청 하기</button>
+  </div>
+  <div v-else>
+    이미 신청하였습니다.
+  </div>
 </template>
 
 <script>
@@ -16,7 +21,8 @@ export default {
       memnum: sessionStorage.getItem("memnum"),
       gender: '',
       roundcnt: 0,
-      dto : {}
+      dto : {},
+      chk : true
     }
   },
   created: function(){
@@ -54,7 +60,7 @@ export default {
       let file = document.querySelector("input");
       
       let formdata = new FormData();
-      formdata.append("memnum",this.dto);
+      formdata.append("memnum",this.memnum);
       formdata.append("theme",this.theme);
       formdata.append("gender",this.gender);
       formdata.append("roundcnt",this.roundcnt);
