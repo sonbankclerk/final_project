@@ -14,11 +14,11 @@ public interface OvoteDao extends JpaRepository<Ovote, Integer>{
 	
 	// 갯수 세기.
 	@Transactional
-	@Query(value = "select * from vote where batnum = :batnum")
+	@Query(value = "select * from vote where batnum = :batnum", nativeQuery = true)
 	List<Ovote> countVote(@Param("batnum") int batnum);
 
 	@Transactional
-	@Query(value = "select * from vote where memnum = :memnum")
+	@Query(value = "select * from vote where memnum = :memnum", nativeQuery = true)
 	List<Ovote> chkVote(@Param("memnum") int memnum);
 
 }
