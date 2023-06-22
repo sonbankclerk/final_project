@@ -36,19 +36,14 @@ public class OmyclosetController {
 	// 옷장에 옷 등록하기(POST)
 	@PostMapping("")
 	public Map addCloth(OmyclosetDto dto) {
-		System.out.println(dto);
 		boolean flag = true;
-		OmyclosetDto dto2;
 		try {
-			service.save(dto);
-			int num = dto.getClosetnum(); // 게시글 번호로 closet 하위폴더 생성하기 위해 num 설정
+			int num = service.saveint(dto);
 			File dir = new File(path + num); // 하위폴더 경로 설정
 			dir.mkdir(); // 디렉토리 생성
 			MultipartFile f = dto.getF();
-			System.out.println("f:" + f);
 			String img = "";
 			String fname = f.getOriginalFilename();
-			System.out.println(fname);
 			if(fname != null & !fname.equals("")) {
 				String newpath = path + num + "/" + fname; // C:/closet/num/fname..
 				File newfile = new File(newpath); // C:/closet/num/fname 복사 생성
@@ -64,13 +59,14 @@ public class OmyclosetController {
 				}
 			}
 			dto.setImg(img); // dto에 img경로 넣어주기
+			dto.setClosetnum(num); // num 덮어쓰기 안하면 img null인 것과 아래에서 완전체 둘 다 생성됨 why?
 		} catch (Exception e) {
 			flag = false;
 		}
-		dto2 = service.save(dto); // dto 저장
+		int savenum = service.saveint(dto);
 		Map map = new HashMap<>();
 		map.put("flag", flag);
-		map.put("dto", dto2);
+		map.put("dto", savenum);
 		return map;
 	}
 	
@@ -84,22 +80,17 @@ public class OmyclosetController {
 	}
 	
 	// 옷 이름, 사진 부분 수정하기(PUT / old & new 부분 수정)
-	@PutMapping("/{closetnum}")
-	public Map edit(@PathVariable("closetnum") int closetnum, OmyclosetDto dto) {
+	@PatchMapping("/editcloth/{closetnum}/{cloth}")
+	public Map patchedit(@PathVariable("closetnum") int closetnum, @PathVariable("cloth") String cloth, OmyclosetDto dto2) {
 		boolean flag = true;
-		OmyclosetDto dto2;
-		// 전달받은 dto num으로 수정전 옷 정보 불러와서 old에 새로 저장
-		OmyclosetDto old = service.getMyCloth(closetnum);
-		if (dto.getCloth() != null) {
-			old.setCloth(dto.getCloth()); // old에 수정한 옷 이름 저장
-		} else {
-			old.setCloth(old.getCloth()); // 수정 없으면 기존 옷 이름 다시 저장
-		}
+		OmyclosetDto dto = service.getMyCloth(closetnum);
 		try {
-			MultipartFile newf = dto.getF();
 			String img = "";
-			String oldpath = old.getImg(); // 원본(옛날옷)의 파일명
+			String oldpath = dto.getImg(); // 원본(옛날옷)의 파일명
+			MultipartFile newf = dto2.getF();
 			String newfname = newf.getOriginalFilename(); // 받아온 옷(수정된)의 파일명
+			System.out.println("newf: " + newf);
+			System.out.println("newfame: " + newfname);
 			if(newfname != null & !newfname.equals("")) { // 받아온 옷이 null이 아니라면,
 				String newpath = path + closetnum + "/" + newfname; // C:/closet/num/newfname.. 수정된 옷의 새로운 경로 지정
 				File newfile = new File(newpath); // 새로운 경로 C:/closet/num/newfname 복사 생성
@@ -109,7 +100,7 @@ public class OmyclosetController {
 					oldfile.delete(); // 삭제
 					newf.transferTo(newfile); // 수정 파일 업로드하기
 					img = newpath; // 수정된 파일 새로운 경로
-					old.setImg(img); // old에 저장
+					dto.setImg(img); // dto에 새로 저장
 				} catch (IllegalStateException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -118,33 +109,92 @@ public class OmyclosetController {
 					e.printStackTrace();
 				}
 			} else {
-				old.setImg(oldpath); // null이 아니라면 기존 옷 다시 저장
+				dto.setImg(oldpath); // null이면 기존 옷 다시 저장
 			}
 		} catch (Exception e) {
 			flag = false;
 		}
-		dto2 = service.save(old); // 덮어쓰기
+		if(cloth != dto.getCloth()) {
+			dto.setCloth(cloth);
+		} else {
+			dto.setCloth(dto.getCloth());
+		}
+		dto.setClosetnum(closetnum);
+		OmyclosetDto newdto = service.save(dto);
 		Map map = new HashMap<>();
 		map.put("flag", flag);
-		map.put("dto", dto2);
+		map.put("dto", newdto);
 		return map;
 	}
+
+	// 옷 이름, 사진 부분 수정하기 이전 버전.. 작동 안함 (PUT / old & new 부분 수정)
+//	@PutMapping("")
+//	public Map edit(OmyclosetDto dto) {
+//		boolean flag = true;
+//		// 전달받은 dto num으로 수정전 옷 정보 불러와서 old에 새로 저장
+//		OmyclosetDto old = service.getMyCloth(dto.getClosetnum());
+//		System.out.println(dto.getClosetnum());
+//		System.out.println(dto.getCloth());
+//		System.out.println(old.getClosetnum());
+//		if (dto.getCloth() != old.getCloth()) {
+//			old.setCloth(dto.getCloth()); // old에 수정한 옷 이름 저장
+//		} else {
+//			old.setCloth(old.getCloth()); // 수정 없으면 기존 옷 이름 다시 저장
+//		}
+//		try {
+//			MultipartFile newf = dto.getF();
+//			String img = "";
+//			String oldpath = old.getImg(); // 원본(옛날옷)의 파일명
+//			String newfname = newf.getOriginalFilename(); // 받아온 옷(수정된)의 파일명
+//			if(newfname != null & !newfname.equals("")) { // 받아온 옷이 null이 아니라면,
+//				String newpath = path + dto.getClosetnum() + "/" + newfname; // C:/closet/num/newfname.. 수정된 옷의 새로운 경로 지정
+//				File newfile = new File(newpath); // 새로운 경로 C:/closet/num/newfname 복사 생성
+//				try {
+//					String delimg = oldpath; // 원본파일경로
+//					File oldfile = new File(delimg); // 원본파일 삭제 객체 생성
+//					oldfile.delete(); // 삭제
+//					newf.transferTo(newfile); // 수정 파일 업로드하기
+//					img = newpath; // 수정된 파일 새로운 경로
+//					old.setImg(img); // old에 저장
+//				} catch (IllegalStateException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			} else {
+//				old.setImg(oldpath); // null이면 기존 옷 다시 저장
+//			}
+//		} catch (Exception e) {
+//			flag = false;
+//		}
+//		OmyclosetDto dto2 = service.save(old); // 덮어쓰기
+//		Map map = new HashMap<>();
+//		map.put("flag", flag);
+//		map.put("dto", dto2);
+//		return map;
+//	}
 	
 	// 옷 즐겨찾기 on, off 하기(PATCH(closetnum) / favorite = (0 or 1)일 때 (1 or 0)으로 수정)
 	@PatchMapping("/{closetnum}")
 	public Map favorite(@PathVariable("closetnum") int closetnum) {
 		boolean flag = true;
+		int check = 0;
 		OmyclosetDto dto = service.getMyCloth(closetnum); // favorite 검사하기 위해 받아온 pk로 호출
 		try {
 			if(dto.getFavorite() == 0) { // favorite 0이면,
 				service.updateFavoriteOn(closetnum); // 1로 수정(좋아요 on)
+				check = 1;
 			} else { // 0이 아니면
 				service.updateFavoiteOff(closetnum); // 0으로 수정(좋아요 off)
+				check = 0;
   			}
 		} catch (Exception e) {
 			flag = false;
 		}
 		Map map = new HashMap<>();
+		map.put("check", check);
 		map.put("flag", flag);
 		return map;
 	}
@@ -186,6 +236,25 @@ public class OmyclosetController {
 		return map;
 	}
 	
+	// 옷장에 옷 등록할 때 이미지 클릭하는 부분 폴더에 저장해 놓은 기본 이미지 뜨게 하려고 만듬
+	@GetMapping("/img/addimg")
+	public ResponseEntity<byte[]> read_addimg(){
+		String fname = "c:/closet/addimg/imageadd.png";
+		File f = new File(fname);
+		HttpHeaders header = new HttpHeaders(); // HttpHeaders 객체 생성
+		ResponseEntity<byte[]> result = null; // 선언
+		try {
+			header.add("Content-Type", Files.probeContentType(f.toPath()));// 응답 데이터의 종류를 설정
+			// 응답 객체 생성
+			result = new ResponseEntity<byte[]>(FileCopyUtils.copyToByteArray(f), header, HttpStatus.OK);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("result:" + result);
+		return result;
+	}
+	
 	// 옷 이미지 추출하기
 	@GetMapping("/img/{closetnum}")
 	public ResponseEntity<byte[]> read_img(@PathVariable("closetnum") int closetnum) {
@@ -212,6 +281,7 @@ public class OmyclosetController {
 	// 옷 삭제하기(Delete(closetnum))
 	@DeleteMapping("/{closetnum}")
 	public Map delete(@PathVariable("closetnum") int closetnum) {
+		System.out.println("왔다");
 		boolean flag = true;
 		try {
 			service.delete(closetnum);

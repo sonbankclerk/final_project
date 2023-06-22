@@ -48,9 +48,16 @@ public class OmyclosetService {
 	public OmyclosetDto save(OmyclosetDto dto) {
 		Omycloset entity = dao.save(new Omycloset(dto.getClosetnum(), dto.getMemnum(), dto.getCloth(), dto.getImg(),
 				dto.getMaintag(), dto.getSubtag(), dto.getFavorite()));
+		System.out.println(entity.getClosetnum());
 		return new OmyclosetDto(entity.getClosetnum(), entity.getMemnum(), entity.getCloth(), entity.getImg(), dto.getF(),
 				entity.getMaintag(), entity.getSubtag(), entity.getFavorite());
 //		return (OmyclosetDto)change(entity);
+	}
+	
+	public int saveint(OmyclosetDto dto) {
+		Omycloset entity = dao.save(new Omycloset(dto.getClosetnum(), dto.getMemnum(), dto.getCloth(), dto.getImg(),
+				dto.getMaintag(), dto.getSubtag(), dto.getFavorite()));
+		return entity.getClosetnum();
 	}
 
 	// 즐겨찾기 On
