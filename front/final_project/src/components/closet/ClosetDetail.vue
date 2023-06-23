@@ -66,20 +66,31 @@ export default {
     },
     methods: {
         change(closetnum) {
-            alert(closetnum)
             const self = this;
             let formdata = new FormData();
-            formdata.append('f', self.uploadimg)
-            self.$axios.patch('http://localhost:7878/closets/editcloth/' + closetnum + "/" + self.cloth, formdata)
-                .then(function (res) {
-                    if (res.status == 200) {
-                        let newdto = res.data.dto
-                        alert(newdto.cloth)
-                        self.cloth = newdto.cloth;
-                    } else {
-                        alert('에러코드: ' + res.status)
-                    }
-                })
+            if(self.uploadimg == null){
+                self.$axios.patch('http://localhost:7878/closets/editcloth/' + closetnum + "/" + self.cloth)
+                    .then(function (res) {
+                        if (res.status == 200) {
+                            let newdto = res.data.dto
+                            self.cloth = newdto.cloth;
+                        } else {
+                            alert('에러코드: ' + res.status)
+                        }
+                })    
+            } else {
+                formdata.append('newf', self.uploadimg)
+                self.$axios.patch('http://localhost:7878/closets/editcloth/' + closetnum + "/" + self.cloth, formdata)
+                    .then(function (res) {
+                        if (res.status == 200) {
+                            let newdto = res.data.dto
+                            alert(newdto.cloth)
+                            self.cloth = newdto.cloth;
+                        } else {
+                            alert('에러코드: ' + res.status)
+                        }
+                    })
+            }
         },
         thumbnail() {
             const file = document.getElementById('imgtag');

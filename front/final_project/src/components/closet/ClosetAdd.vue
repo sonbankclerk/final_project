@@ -2,6 +2,7 @@
     <div>
         <h3>옷장에 옷 등록하기</h3>
         <label for="imgtag">
+            <!-- <img src="../../assets/imageadd.png"> -->
             <img :src="thumbimg">
         </label>
         <input type="file" id="imgtag" style="display:none" accept="image/*" v-on:change="thumbnail"><br />
@@ -21,6 +22,7 @@
 </template>
 
 <script>
+
 export default {
     name: 'ClosetAdd',
     data() {
@@ -40,15 +42,20 @@ export default {
     },
     methods: {
         thumbnail() {
-            const file = document.getElementById('imgtag');
-            if (file.files && file.files[0]) {
-                const reader = new FileReader();
+            const file = document.getElementById('imgtag'); // type file에 올려진 file을 상수 file에 저장한다.
+            if (file.files[0]) { // file은 하나만 올리므로 files 배열의 [0]만 null인지 아닌지 확인한다.
+                // FileReader(): 자바스크립트 API.. 파일을 비동기적으로 읽을 수 있으며, 주로 파일의 내용을 읽어서 데이터를 가져오는 데 사용한다.
+                const reader = new FileReader(); // FileReader의 새로운 객체를 생성(new)하여(인스턴스를 생성하여) reader 변수에 담는다. 
                 const self = this;
-                reader.onload = function() {
-                    self.thumbimg = reader.result;
-                    self.uploadimg = file.files[0];
+                reader.onload = function() { // reader.onload 이벤트 핸들러는 파일 읽기가 완료되었을 때 호출되는 콜백 함수를 정의하는 역할을 한다.
+                    self.thumbimg = reader.result; // reader.result 속성은 파일의 데이터를 담고 있는 문자열을 제공함, 이 문자열은 일반적으로 이미지 파일의 경우 base64 인코딩된 이미지 데이터를 포함한다.
+                    // 따라서 인코딩된 이미지 데이터를 thumbnail에 담아서 이미지를 미리보기 해주는 역할을 수행한다.
+                    self.uploadimg = file.files[0];  // 업로드한 파일을 uploadimg에 담아서 back에 보내는 역할을 한다.
                 };
                 reader.readAsDataURL(file.files[0]);
+                // FileReader의 객체를 사용하여 여러 방식으로 데이터를 읽을 수 있다.
+                // 여기에서 사용된 readAsDataURL 메서드는 파일을 데이터 url형식으로 읽는다.
+                // 업로드한 파일을 해당 메서드가 읽고, 파일 읽기가 완료되면 read.onload 이벤트 핸들러 내부의 작업이 시작된다.
             }
         },
         updatesub() {
@@ -67,17 +74,20 @@ export default {
         },
         addcloset() {
             const self = this;
-            // const file = document.getElementById('imgpath');
             let formdata = new FormData();
-            formdata.append('f', self.uploadimg)
-            formdata.append('memnum', self.memnum)
-            formdata.append('cloth', self.clothname)
-            formdata.append('maintag', self.selectedmain)
-            formdata.append('subtag', self.selectedsub)
-            self.$axios.post('http://localhost:7878/closets', formdata)
-                .then(function () {
-                    location.href = "/closetlist"
-                })
+            if(self.uploadimg == ''){
+                alert("옷 이미지를 등록해주세요.")
+            } else {
+                formdata.append('f', self.uploadimg)
+                formdata.append('memnum', self.memnum)
+                formdata.append('cloth', self.clothname)
+                formdata.append('maintag', self.selectedmain)
+                formdata.append('subtag', self.selectedsub)
+                self.$axios.post('http://localhost:7878/closets', formdata)
+                    .then(function () {
+                        location.href = "/closetlist"
+                    })
+            }
         }
     }
 }
