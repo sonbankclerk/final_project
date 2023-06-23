@@ -45,8 +45,10 @@ public class OmemberController {
 	@PostMapping("")
 	public Map join(@RequestParam("mf") MultipartFile mf, OmemberDto dto) {
 //		OmemberDto d = service.save(dto);
+		//Map map = new HashMap();
 		Map map = new HashMap();
 		boolean flag = true;
+		
 		try {
 			dto = service.save(dto);
 			File dir = new File(path + dto.getMemnum());
@@ -68,6 +70,15 @@ public class OmemberController {
 
 		map.put("flag", flag);
 		map.put("dto", dto);
+		return map;
+	}
+	
+	//회원가입(이미지X)
+	@PostMapping("/omem")
+	public Map join(OmemberDto dto) {
+		OmemberDto d = service.save(dto);
+		Map map = new HashMap();
+		map.put("d", dto);
 		return map;
 	}
 
