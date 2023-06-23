@@ -1,7 +1,9 @@
 <template>
   <input type="button" value="랜덤 두명 뽑기" @click="find">
   {{ firstCandidate }}
+  <img :src="'http://localhost:8081/battles/imgs/'+firstCandidate.batnum" alt="첫 번째">
   {{ secondCandidate }}
+  <img :src="'http://localhost:8081/battles/imgs/'+secondCandidate.batnum" alt="두 번째">
   <input type="button" value="후보 확정 하기" @click="firm">
 </template>
 
@@ -11,7 +13,7 @@ export default{
   data(){
     return{
       firstCandidate : {},
-      secondCandidate : {}
+      secondCandidate : {},
     }
   },
   methods:{
@@ -32,10 +34,14 @@ export default{
       let self = this;
       let form = new FormData();
 
-      form.append("num1",this.firstCandidate.batnum);
-      form.append("num2",this.secondCandidate.batnum);
+      form.append("num1",self.firstCandidate.batnum);
+      form.append("num2",self.secondCandidate.batnum);
 
-      self.$axios.delete('http://localhost:8081/battles/manager/random',form)
+      alert(self.firstCandidate.batnum)
+      alert(self.secondCandidate.batnum)
+
+      alert(`http://localhost:8081/battles/manager/random/${self.firstCandidate.batnum}/${self.secondCandidate.batnum}`);
+      self.$axios.delete(`http://localhost:8081/battles/manager/random/${self.firstCandidate.batnum}/${self.secondCandidate.batnum}`)
       .then(res => {
         if(res.status == 200){
           alert('후보 확정');

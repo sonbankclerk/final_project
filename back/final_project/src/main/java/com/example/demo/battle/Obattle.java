@@ -34,8 +34,6 @@ public class Obattle {
 		@OnDelete(action = OnDeleteAction.CASCADE)
 		private Omember memnum;
 		
-		// 배틀 투표
-		private int vote;
 		// 배틀 신청 사진
 		private String img;
 		// 배틀 테마(주제)
@@ -49,7 +47,6 @@ public class Obattle {
 		
 		@PrePersist
 		private void defaultVote() {
-			this.vote = 0;
 			this.winners = false;
 		}
 }

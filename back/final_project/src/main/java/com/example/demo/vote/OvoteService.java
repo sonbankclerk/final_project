@@ -46,9 +46,9 @@ public class OvoteService {
 	
 	
 	// 투표 추가.
-	public void save(OvoteDto dto) {
+	public OvoteDto save(OvoteDto dto) {
 		Ovote vo = (Ovote)change(dto);
-		dao.save(vo);
+		return (OvoteDto)change(dao.save(vo));
 	}
 	
 	// 투표 수 count
@@ -68,5 +68,10 @@ public class OvoteService {
 		System.out.println("list : " + list);
 		System.out.println("list's empty " + list.isEmpty());
 		return list.isEmpty();
+	}
+	
+	// winner 찾기.
+	public Integer findWinner() {
+		return dao.findWinner();
 	}
 }

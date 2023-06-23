@@ -14,8 +14,6 @@ public class ObattleDto {
 	private int batnum;
 	// 외래키(멤버)
 	private Omember memnum;
-	// 배틀 투표
-	private int vote;
 	// 배틀 신청 사진
 	private String img;
 	// 배틀 테마(주제)
