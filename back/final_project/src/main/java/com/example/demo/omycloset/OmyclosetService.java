@@ -49,7 +49,7 @@ public class OmyclosetService {
 		Omycloset entity = dao.save(new Omycloset(dto.getClosetnum(), dto.getMemnum(), dto.getCloth(), dto.getImg(),
 				dto.getMaintag(), dto.getSubtag(), dto.getFavorite()));
 		System.out.println(entity.getClosetnum());
-		return new OmyclosetDto(entity.getClosetnum(), entity.getMemnum(), entity.getCloth(), entity.getImg(), dto.getF(),
+		return new OmyclosetDto(entity.getClosetnum(), entity.getMemnum(), entity.getCloth(), entity.getImg(),
 				entity.getMaintag(), entity.getSubtag(), entity.getFavorite());
 //		return (OmyclosetDto)change(entity);
 	}
@@ -76,7 +76,7 @@ public class OmyclosetService {
 		if(entity == null) {
 			return null;
 		} else {
-			return new OmyclosetDto(entity.getClosetnum(), entity.getMemnum(), entity.getCloth(), entity.getImg(), null,
+			return new OmyclosetDto(entity.getClosetnum(), entity.getMemnum(), entity.getCloth(), entity.getImg(),
 					entity.getMaintag(), entity.getSubtag(), entity.getFavorite());
 //			return (OmyclosetDto)change(entity);
 		}
@@ -87,7 +87,7 @@ public class OmyclosetService {
 		ArrayList<Omycloset> list = (ArrayList<Omycloset>) dao.findAll();
 		ArrayList<OmyclosetDto> list2 = new ArrayList<OmyclosetDto>();
 		for (Omycloset o : list) {
-			list2.add(new OmyclosetDto(o.getClosetnum(), o.getMemnum(), o.getCloth(), o.getImg(), null, o.getMaintag(),
+			list2.add(new OmyclosetDto(o.getClosetnum(), o.getMemnum(), o.getCloth(), o.getImg(), o.getMaintag(),
 					o.getSubtag(), o.getFavorite()));
 		}
 		return list2;
@@ -98,7 +98,7 @@ public class OmyclosetService {
 		ArrayList<Omycloset> list = (ArrayList<Omycloset>) dao.findByMaintag(maintag);
 		ArrayList<OmyclosetDto> list2 = new ArrayList<OmyclosetDto>();
 		for(Omycloset o : list) {
-			list2.add(new OmyclosetDto(o.getClosetnum(), o.getMemnum(), o.getCloth(), o.getImg(), null, o.getMaintag(),
+			list2.add(new OmyclosetDto(o.getClosetnum(), o.getMemnum(), o.getCloth(), o.getImg(), o.getMaintag(),
 					o.getSubtag(), o.getFavorite()));
 		}
 		return list2;
@@ -109,7 +109,7 @@ public class OmyclosetService {
 		ArrayList<Omycloset> list = (ArrayList<Omycloset>) dao.findBySubtag(subtag);
 		ArrayList<OmyclosetDto> list2 = new ArrayList<OmyclosetDto>();
 		for(Omycloset o : list) {
-			list2.add(new OmyclosetDto(o.getClosetnum(), o.getMemnum(), o.getCloth(), o.getImg(), null, o.getMaintag(),
+			list2.add(new OmyclosetDto(o.getClosetnum(), o.getMemnum(), o.getCloth(), o.getImg(), o.getMaintag(),
 					o.getSubtag(), o.getFavorite()));
 		}
 		return list2;
@@ -120,7 +120,7 @@ public class OmyclosetService {
 		ArrayList<Omycloset> list = dao.findByClothLike("%" + cloth + "%");
 		ArrayList<OmyclosetDto> list2 = new ArrayList<OmyclosetDto>();
 		for(Omycloset o : list) {
-			list2.add(new OmyclosetDto(o.getClosetnum(), o.getMemnum(), o.getCloth(), o.getImg(), null, o.getMaintag(),
+			list2.add(new OmyclosetDto(o.getClosetnum(), o.getMemnum(), o.getCloth(), o.getImg(), o.getMaintag(),
 					o.getSubtag(), o.getFavorite()));
 		}
 		return list2;

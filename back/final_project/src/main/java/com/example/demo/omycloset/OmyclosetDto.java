@@ -20,7 +20,7 @@ public class OmyclosetDto {
 	private Omember memnum;
 	private String cloth;
 	private String img;
-	private MultipartFile f;
+//	private MultipartFile f;
 	private String maintag;
 	private String subtag;
 	private int favorite;

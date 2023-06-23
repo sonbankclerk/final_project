@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.omycloset.OmyclosetService;
 import com.example.demo.ootwImgs.OootwimgsDto;
 import com.example.demo.ootwImgs.OootwimgsService;
 
@@ -25,23 +26,18 @@ public class OootwController {
 	private OootwService service;
 	@Autowired
 	private OootwimgsService imgservice;
+	@Autowired
+	private OmyclosetService closetservice;
 	
 	// 게시글 작성.. POST
 	@PostMapping("")
-	public Map add(OootwDto dto1, ArrayList<OootwimgsDto> dto2) {
+	public Map add(OootwDto dto, int closetnum1, int closetnum2, int closetnum3, int closetnum4, int closetnum5) {
 		// oootwdto = "ootwnum", memnum, odate, weather, temp, comments
 		// oootwimgsdto = ootwimgsnum, "ootwnum", closetnum
-		System.out.println("dto1: " + dto1);
-		System.out.println("dto2: " + dto2); // postman에서 값 못받아오네 흠..
-		OootwDto odto1 = service.save(dto1); // 옷장 이미지 정보 제외한 것들 저장
-		ArrayList<OootwimgsDto> odto2list = new ArrayList<>();
-		for(OootwimgsDto listdto : dto2) {
-			OootwimgsDto odto2 = imgservice.save(listdto); // 옷장 이미지 정보 저장
-			odto2list.add(odto2);
-		}
+		OootwDto odto = service.save(dto); // 옷장 이미지 정보 제외한 것들 저장
+		OootwimgsDto imgdto = null;
 		Map map = new HashMap<>();
-		map.put("dto1", odto1);
-		map.put("dto2", odto2list);
+		map.put("dto1", odto);
 		return map;
 	}
 	
