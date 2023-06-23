@@ -6,8 +6,11 @@
         email:<input type="text" v-model="email" readonly><br/>
         gender:{{ gender }}<br/>
         nickname:<input type="text" v-model="nickname"><br/>
-        img:<img :src= "'http://localhost:8081/members/imgs/' + num" @click="handleImgClick" alt="img"><br/>
-        <input type="file" ref="fileInput" style="display: none;" @change="handleFileChange">
+
+        <label for ="newimg">
+            img:<img :src= "profileImg()" style="cursor: pointer;"><br/>
+        </label>
+        <input type="file" id="newimg" accept="img/*" @change="changeImg"><br/>
         <button v-on:click="edit">수정</button>
         <button v-on:click="out">탈퇴</button>
         <button v-on:click="logout">로그아웃</button>
@@ -52,8 +55,19 @@ export default{
             }
         });
     },
+    
 
     methods:{
+
+        //프로필사진
+        profileImg(){
+            if(this.img != null){
+                return 'http://localhost:8081/members/imgs/'+ this.num;
+            } else{
+                return require('@/assets/default.jpg')
+            }
+        },
+
         //내정보수정(비밀번호, 닉네임)
         edit(){
             const self = this
@@ -81,9 +95,22 @@ export default{
         },
 
         //프로필 이미지 수정
-         handleImgClick(){
-             this.$refs.fileInput.click(); //이미지 클릭시 파일 선택창 열기
-         },
+        changeImg(event){
+            const file = event.target.files[0];
+            if(file){
+                const reader = new FileReader();
+                const self = this;
+                reader.onload = function(){
+                    self.img = reader.result;
+                    self.uploadimg = file;
+                };
+                reader.readAsDataURL(file);
+            }
+        },
+        
+        //  handleImgClick(){
+        //      this.$refs.fileInput.click(); //이미지 클릭시 파일 선택창 열기
+        //  },
         // handleFileChange(event){
         //     const file = event.target.files[0] //선택파일
 
