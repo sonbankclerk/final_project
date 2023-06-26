@@ -22,6 +22,12 @@ public interface OmyclosetDao extends JpaRepository<Omycloset, Integer> {
 	// 옷 이름 키워드 리스트 검색하기
 	ArrayList<Omycloset> findByClothLike(String cloth);
 	
+	// 즐겨찾기 순서 => 최신 등록순
+	@Transactional
+	@Modifying
+	@Query(value="select * from omycloset order by favorite desc, closetnum desc", nativeQuery = true)
+	ArrayList<Omycloset> findAllByClosetnumAndFavorite();
+	
 	// 즐겨찾기 on.. pk받아와서 0 => 1로 수정
 	@Transactional
 	@Modifying

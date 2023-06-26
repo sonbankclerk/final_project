@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.omycloset.Omycloset;
+import com.example.demo.omycloset.OmyclosetDto;
 import com.example.demo.omycloset.OmyclosetService;
 import com.example.demo.ootwImgs.OootwimgsDto;
 import com.example.demo.ootwImgs.OootwimgsService;
@@ -31,13 +33,69 @@ public class OootwController {
 	
 	// 게시글 작성.. POST
 	@PostMapping("")
-	public Map add(OootwDto dto, int closetnum1, int closetnum2, int closetnum3, int closetnum4, int closetnum5) {
+	public Map add(OootwDto dto, Integer[] closetnum) {
 		// oootwdto = "ootwnum", memnum, odate, weather, temp, comments
 		// oootwimgsdto = ootwimgsnum, "ootwnum", closetnum
-		OootwDto odto = service.save(dto); // 옷장 이미지 정보 제외한 것들 저장
-		OootwimgsDto imgdto = null;
+		
+		// 옷장 이미지 정보 제외한 것들 저장
+		OootwDto odto = service.save(dto);
+		int closetnum1 = closetnum[0];
+		int closetnum2 = closetnum[1];
+		int closetnum3 = closetnum[2];
+		int closetnum4 = closetnum[3];
+		int closetnum5 = closetnum[4];
+		// int 옷장 번호로 옷장 정보 불러오기
+		OmyclosetDto closetdto1 = closetservice.getMyCloth(closetnum1);
+		OmyclosetDto closetdto2 = closetservice.getMyCloth(closetnum2);
+		OmyclosetDto closetdto3 = closetservice.getMyCloth(closetnum3);
+		OmyclosetDto closetdto4 = closetservice.getMyCloth(closetnum4);
+		OmyclosetDto closetdto5 = closetservice.getMyCloth(closetnum5);
+		// oootwimgs entity에 넣을 Omyclost, Oootw 멤버변수 구하기 위해 각자 생성자 생성
+		Omycloset closetVo1 = new Omycloset();
+		Omycloset closetVo2 = new Omycloset();
+		Omycloset closetVo3 = new Omycloset();
+		Omycloset closetVo4 = new Omycloset();
+		Omycloset closetVo5 = new Omycloset();
+		Oootw oootwVo1 = new Oootw();
+		Oootw oootwVo2 = new Oootw();
+		Oootw oootwVo3 = new Oootw();
+		Oootw oootwVo4 = new Oootw();
+		Oootw oootwVo5 = new Oootw();
+		// 각각의 생성자에 위에서 저장한 dto의 fk들 저장
+		closetVo1.setClosetnum(closetdto1.getClosetnum());
+		oootwVo1.setOotwnum(odto.getOotwnum());
+		closetVo2.setClosetnum(closetdto2.getClosetnum());
+		oootwVo2.setOotwnum(odto.getOotwnum());
+		closetVo3.setClosetnum(closetdto3.getClosetnum());
+		oootwVo3.setOotwnum(odto.getOotwnum());
+		closetVo4.setClosetnum(closetdto4.getClosetnum());
+		oootwVo4.setOotwnum(odto.getOotwnum());
+		closetVo5.setClosetnum(closetdto5.getClosetnum());
+		oootwVo5.setOotwnum(odto.getOotwnum());
+		// 마지막으로 Oootwimgs Dto에 각각 멤버변수 집어넣기
+		OootwimgsDto imgdto1 = new OootwimgsDto();
+		imgdto1.setClosetnum(closetVo1);
+		imgdto1.setOotwnum(oootwVo1);
+		OootwimgsDto imgdto2 = new OootwimgsDto();
+		imgdto2.setClosetnum(closetVo2);
+		imgdto2.setOotwnum(oootwVo2);
+		OootwimgsDto imgdto3 = new OootwimgsDto();
+		imgdto3.setClosetnum(closetVo3);
+		imgdto3.setOotwnum(oootwVo3);
+		OootwimgsDto imgdto4 = new OootwimgsDto();
+		imgdto4.setClosetnum(closetVo4);
+		imgdto4.setOotwnum(oootwVo4);
+		OootwimgsDto imgdto5 = new OootwimgsDto();
+		imgdto5.setClosetnum(closetVo5);
+		imgdto5.setOotwnum(oootwVo5);
+		// set을 토대로 OootwimgsDto 새로 저장
+		OootwimgsDto finalImgDto = imgservice.save(imgdto1);
+		finalImgDto = imgservice.save(imgdto2);
+		finalImgDto = imgservice.save(imgdto3);
+		finalImgDto = imgservice.save(imgdto4);
+		finalImgDto = imgservice.save(imgdto5);
 		Map map = new HashMap<>();
-		map.put("dto1", odto);
+		map.put("dto", odto);
 		return map;
 	}
 	

@@ -4,7 +4,7 @@
         <table>
             <tr>
                 <td>
-                    <label for="imgtag"><img :src="'http://localhost:7878/closets/img/' + closetnum" id="thumbimg"></label>
+                    <label for="imgtag"><img :src="'http://localhost:7878/closets/img/' + memnum + '/' + closetnum" id="thumbimg"></label>
                     <input type="file" id="imgtag" style="display: none" accept="image/*" v-on:change="thumbnail">
                 </td>
             </tr>
@@ -42,11 +42,13 @@ export default {
             cloth: '',
             maintag: '',
             subtag: '',
+            memnum: '',
             uploadimg: ''
         }
     },
     created: function () {
         const self = this;
+        self.memnum = sessionStorage.getItem('memnum')
         self.$axios.get('http://localhost:7878/closets/' + self.num)
             .then(function (res) {
                 if (res.status == 200) {
@@ -84,8 +86,8 @@ export default {
                     .then(function (res) {
                         if (res.status == 200) {
                             let newdto = res.data.dto
-                            alert(newdto.cloth)
                             self.cloth = newdto.cloth;
+                            location.reload();
                         } else {
                             alert('에러코드: ' + res.status)
                         }
@@ -119,4 +121,5 @@ img {
 table {
     margin-left: auto;
     margin-right: auto;
-}</style>
+}
+</style>

@@ -16,7 +16,7 @@ import lombok.ToString;
 @AllArgsConstructor
 public class OootwimgsDto {
 	private int ootwimgsnum;
-	private Oootw ootwnum;
+	private Oootw 	ootwnum;
 	private Omycloset closetnum;
 	
 }
