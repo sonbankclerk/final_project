@@ -3,7 +3,6 @@ package com.example.demo.battle;
 import java.io.File;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.channels.MembershipKey;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +10,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,12 +72,29 @@ public class ObattleController {
 		try {
 			// manager가 갖고 있는 테마가 곧 그 주의 테마다. 테마 얻기
 			OmemberDto dto = memberService.getById("manager");
-			String theme = service.findByMemnum(dto.getMemnum()).getTheme();
-			map.put("theme", theme);		
-			
-			// 라운드 수 얻기.
-			int roundcnt = service.findRoundCnt();
-			map.put("roundcnt", roundcnt);
+			ObattleDto battleDto = service.findByMemnum(dto.getMemnum());
+			if(battleDto == null) {
+				map.put("changeTheme", false);
+				return map;
+			}else {
+				String theme = battleDto.getTheme();
+				map.put("theme", theme);		
+				
+				// 라운드 수 얻기.
+				int roundcnt = service.findRoundCnt();
+				map.put("roundcnt", roundcnt);
+				
+				// 만약 관계자가 새로운 테마로 바꾸지 않았다면 아직 테마가 변경되지 않았다고 알린다.
+				// 명예의 전당에서 가장 최근에 있던 테마를 가지고와서
+				// 현재 테마와 비교한다.
+				ArrayList<ObattleDto> list = service.winnerList();
+				if(list != null) {
+					String lastTheme = list.get(0).getTheme();
+					// 테마가 같다면 changeTheme = false가 된다.
+					boolean changeTheme = !lastTheme.equals(theme);
+					map.put("changeTheme", changeTheme);
+				}
+			}
 		}catch(Exception e) {
 			e.printStackTrace();
 			flag = false;
@@ -148,7 +163,11 @@ public class ObattleController {
 		try {
 			OmemberDto dto = memberService.getById("manager");
 			ArrayList<ObattleDto> list = service.findCandidates(dto.getMemnum());
+			
+			// len이 있는 이유는 아직 신청자의 수가 2명 이상이 안될 수도 있기 때문이다.
+			// vue에서 len != 2라면 아직 신청자의 수가 충분하지 않다는 alert를 띄워준다.
 			map.put("list", list);
+			map.put("len", list.size());
 		}catch(Exception e) {
 			e.printStackTrace();
 			flag = false;
@@ -197,6 +216,11 @@ public class ObattleController {
 		try {
 			OmemberDto manager = memberService.getById("manager");
 			ArrayList<ObattleDto> list = service.listCandidates(manager.getMemnum());
+			// 여기서 len으로 list의 길이를 보여주는 이유는
+			// vue에서 오류가 뜨는 것을 방지하기 위함이다.
+			// 오류가 뜬다면 아직 준비되지 않았다는 알림이 있는 notYet component로 이동한다.
+			// list의 길이가 2일때만 제대로 작동하도록 vue에서 만들었다.
+			// 혹시 아직 준비되지 않았다는 모습이 보이면 관계자가 직접 투표 후보를 만들어줘야 한다.
 			map.put("list", list);
 			map.put("len",list.size());
 		}catch(Exception e) {
@@ -217,8 +241,18 @@ public class ObattleController {
 			// vote 테이블에서 투표 수가 더 많은 튜플을 추출 후 
 			// 그 튜플에 있는 batnum을 뽑느다.
 			Integer batnum = voteService.findWinner();
+			
+			// 자동으로 완성하기 위해 아래와 같은 로직을 짰다.
+			// 처음 금주의 우승자를 클릭하면 투표 테이블에 데이터가 있을 것이니
+			// batnum != null이다.
+			// 따라서 else로 들어가게 된다.
+			// 두번째 이후로는 batnum == null 이므로 명예의 전당에서 제일 최근에 있는 튜플을 추출한다.
+			// ex) 명예의 전당은 roundcnt의 역순으로 정렬되어 있으므로 첫번째 값이 제일 최근에 값이 된다.
 			if(batnum == null) {
+				ArrayList<ObattleDto> list = service.winnerList();
+				ObattleDto dto = list.get(0);
 				
+				map.put("dto", dto);
 			}else {
 				// batnum을 명예의 전당으로 승급.
 				ObattleDto dto = service.findWinner(batnum);

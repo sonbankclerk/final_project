@@ -50,10 +50,7 @@ public class ObattleService {
 	// 관계자가 테마 바꾸기.
 	public void updateTheme(String theme, long memnum, OmemberDto dto) {
 		
-		// 변경될 라운드 수 +1 계산 후 저장.
-		int roundcnt = upRoundCnt();
 		System.out.println("theme : " + theme);
-		System.out.println("roundcnt : " + roundcnt);
 		
 		Obattle battle = dao.findByMemnum((int)memnum);
 	
@@ -72,7 +69,7 @@ public class ObattleService {
 			battleVo.setGender(memberVo.getGender());
 			battleVo.setImg(memberVo.getImg());
 			battleVo.setMemnum(memberVo);
-			battleVo.setRoundcnt(roundcnt);
+			battleVo.setRoundcnt(0);
 			battleVo.setTheme(theme);
 			battleVo.setWinners(false);
 			
@@ -80,7 +77,7 @@ public class ObattleService {
 		}else {
 			// 있으면 변경하여 저장한다.
 			battle.setTheme(theme);
-			battle.setRoundcnt(roundcnt);
+			battle.setRoundcnt(0);
 			dao.save(battle);
 		}
 	}
@@ -92,22 +89,22 @@ public class ObattleService {
 		return result;
 	}
 	
-	// 변경될 라운드 수 알려주기.(or) 현재 라운드 수 알려주기.
-	private int upRoundCnt() {
+	// 현재 라운드 수 확인하기.
+	public int findRoundCnt() {
 		// 최대 라운드 수 찾고 + 1 하기
 		ArrayList<Obattle> list = (ArrayList<Obattle>)dao.findMaxRoundcnt();
 		System.out.println(list);
+		
+		// findMaxRoundcnt를 보면 명예의 전당에 올라간 최대 roundcnt를 알 수 있다.
+		// 만약 list == null이라면 아직 명예의 전당이 생성되기 전인 처음 배틀의 시작이므로
+		// 1을 반환하고
+		// 그렇지 않다면 마지막 roundcnt에 + 1 한 값을 반환한다.
 		if(list == null || list.size() == 0) {
 			return 1;
 		}else {
 			int roundcnt = list.get(0).getRoundcnt() + 1;
 			return roundcnt;
 		}
-	}
-	
-	// 현재 라운드 수 확인하기.
-	public int findRoundCnt() {
-		return upRoundCnt();
 	}
 	
 	// 투표 후보들 두명 뽑기 ( 미확정 )

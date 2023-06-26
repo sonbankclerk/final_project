@@ -50,10 +50,12 @@ export default{
       // 투표대상인 후보들 리스트 뽑기.
       self.$axios.get("http://localhost:8081/battles")
       .then(res =>{
-        if(res.status == 200 && res.data.len == 2){
-          this.firstCandidate = res.data.list[0];
-          this.secondCandidate = res.data.list[1];
-          this.prepared = true;
+        if(res.status == 200 ){
+          if(res.data.len == 2){
+            this.firstCandidate = res.data.list[0];
+            this.secondCandidate = res.data.list[1];
+            this.prepared = true;
+          }
         }else{
           alert("오류 발생으로 인한 후보들 정보 불러오기 실패")
         }})
