@@ -2,7 +2,6 @@
     <div>
         <h3>옷장에 옷 등록하기</h3>
         <label for="imgtag">
-            <!-- <img src="../../assets/imageadd.png"> -->
             <img :src="thumbimg">
         </label>
         <input type="file" id="imgtag" style="display:none" accept="image/*" v-on:change="thumbnail"><br />

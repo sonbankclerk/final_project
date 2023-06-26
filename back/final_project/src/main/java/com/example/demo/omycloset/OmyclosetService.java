@@ -92,6 +92,17 @@ public class OmyclosetService {
 		}
 		return list2;
 	}
+	
+	// 즐겨찾기순(desc) => 내옷 최신 등록순(desc) & 즐
+	public ArrayList<OmyclosetDto> getAllByOrder(){
+		ArrayList<Omycloset> list = (ArrayList<Omycloset>) dao.findAllByClosetnumAndFavorite();
+		ArrayList<OmyclosetDto> dtolist = new ArrayList<>();
+		for(Omycloset o : list) {
+			dtolist.add(new OmyclosetDto(o.getClosetnum(), o.getMemnum(), o.getCloth(), o.getImg(), o.getMaintag(),
+					o.getSubtag(), o.getFavorite()));
+		}
+		return dtolist;
+	}
 
 	// 내옷 대분류 카테고리 검색
 	public ArrayList<OmyclosetDto> getByMaintag(String maintag) {

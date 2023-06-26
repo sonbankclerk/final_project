@@ -14,10 +14,10 @@
                     <li class="second" v-on:click="listbytag(subtag, index)" id="sub">{{ subtag }}</li>
                 </ul>
             </div>
-        </div><br/>
+        </div><br />
 
-        <div>
-            <b-card-group deck v-for="(row, index) in additionalCloset" :key="index" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
+            <b-card-group deck v-for="(row, index) in additionalCloset" :key="index">
                 <b-card v-for="closet in row" :key="closet.closetnum"
                     :img-src="'http://localhost:7878/closets/img/' + memnum + '/' + closet.closetnum" img-top
                     style="max-width:200px; height: auto; flex: 0 0 250px;">
@@ -27,7 +27,7 @@
                     <b-card-text>
                         {{ closet.maintag }}<br />
                         {{ closet.subtag }}<br />
-                        <a v-on:click="detail(closet.closetnum)">{{ closet.cloth }}</a><br />
+                        {{ closet.cloth }}<br />
                     </b-card-text>
                     <template #footer>
                         <small class="text-muted">
@@ -44,39 +44,55 @@
 
 <script>
 export default {
-    name: 'OotwSelect',
+    name: 'ClosetlistByTag',
     data() {
         return {
+            tag: this.$route.query.tag,
+            index: this.$route.query.index,
             closetlist: [],
             additionalCloset: [],
             closetPerPage: 5,
             currentPage: 1,
             maintags: ['전체', '아우터', '상의', '하의', '기타', 'acc'],
             subtags: [],
-            memnum: '',
+            memnum: sessionStorage.getItem('memnum'),
             cloth: ''
         }
     },
     created: function () { // 해당 컴포넌트가 처음 실행될 때만 적용... 그 다음부터는 변경된 컴포넌트(같은 컴포넌트로 이동할 때 적용이 안됨)
         const self = this;
-        self.memnum = sessionStorage.getItem('memnum')
-        self.$axios.get('http://localhost:7878/closets')
-            .then(function (res) {
-                if (res.status == 200) {
-                    // 컴포넌트 처음 로딩될 때 옷장에서 999999999번 default 걸러서 리스트에 넣기
-                    self.closetlist = res.data.list.filter(closet => closet.closetnum != 999999999);
-                    const addtionalRow = self.closetlist.slice(0, self.closetPerPage);
-                    self.additionalCloset.push(addtionalRow);
-                } else {
-                    alert('에러코드: ' + res.status)
-                }
-            })
+        if (self.index == 0) {
+            let maintag = self.tag.split('(', 1)
+            self.$axios.get('http://localhost:7878/closets/maintags/' + maintag)
+                .then(function (res) {
+                    if (res.status == 200) {
+                        // 컴포넌트 처음 로딩될 때 옷장에서 999999999번 default 걸러서 리스트에 넣기
+                        self.closetlist = res.data.list.filter(closet => closet.closetnum != 999999999);
+                        const addtionalRow = self.closetlist.slice(0, self.closetPerPage);
+                        self.additionalCloset.push(addtionalRow);
+                    } else {
+                        alert('에러코드: ' + res.status)
+                    }
+                })
+        } else {
+            self.$axios.get('http://localhost:7878/closets/subtags/' + self.tag)
+                .then(function (res) {
+                    if (res.status == 200) {
+                        // 컴포넌트 처음 로딩될 때 옷장에서 999999999번 default 걸러서 리스트에 넣기
+                        self.closetlist = res.data.list.filter(closet => closet.closetnum != 999999999);
+                        const addtionalRow = self.closetlist.slice(0, self.closetPerPage);
+                        self.additionalCloset.push(addtionalRow);
+                    } else {
+                        alert('에러코드: ' + res.status)
+                    }
+                })
+        }
     },
     methods: {
         getall(index) {
             // const self = this;
             if (index == 0) { // 메인태그 '전체'일 때만 전체 리스트 보여주기 설정
-                location.reload();
+                location.href = '/closetlist'
                 // self.$axios.get('http://localhost:7878/closets')
                 //     .then(function (res) {
                 //         if (res.status == 200) {
@@ -157,17 +173,17 @@ export default {
                 })
         },
         clothserach() {
-            // const self = this;
-            // var cloth = self.cloth;
-            // self.$axios.get('http://localhost:7878/closets/clothes/' + cloth)
-            //     .then(function (res) {
-            //         if (res.status == 200) {
-            //             self.closetlist = res.data.list.filter(closet => closet.closetnum != 999999999);
-            //             self.additionalCloset = self.additionalCloset.map(row => row.filter(closet => closet.cloth = cloth));
-            //         } else {
-            //             alert('에러코드' + res.status)
-            //         }
-            //     })
+            const self = this;
+            var cloth = self.cloth;
+            self.$axios.get('http://localhost:7878/closets/clothes/' + cloth)
+                .then(function (res) {
+                    if (res.status == 200) {
+                        self.closetlist = res.data.list
+                        self.cloth = '';
+                    } else {
+                        alert('에러코드' + res.status)
+                    }
+                })
         },
         selectsub(index) {
             const self = this;
@@ -187,7 +203,7 @@ export default {
         },
         listbytag(subtag, index) {
             const self = this;
-            self.$router.push({ name: 'ClosetlistByTag', query: { tag: subtag, index: index } });
+            self.$router.push({ name: 'ClosetlistByTag2', query: { tag: subtag, index: index } });
         }
     }
 }

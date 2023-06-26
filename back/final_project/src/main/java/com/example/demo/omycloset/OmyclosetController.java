@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.plaf.multi.MultiFileChooserUI;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -21,10 +19,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -40,16 +38,24 @@ public class OmyclosetController {
 	public Map addCloth(OmyclosetDto dto, MultipartFile f) {
 		boolean flag = true;
 		try {
-			int num = service.saveint(dto);
-			File dir = new File(path + num); // 하위폴더 경로 설정
-			dir.mkdir(); // 디렉토리 생성
-//			MultipartFile f = dto.getF();
+			int closetnum = service.saveint(dto);
+			int memnum = dto.getMemnum().getMemnum();
+			String newpath = path + memnum + "/" + closetnum;
+			System.out.println("폴더 경로: " + newpath);
+			// springboot에 등록된 path 밑에 하위폴더 하나씩만 생성 가능?
+			// 멤버번호로 하위폴더 하나 우선 만들고
+			File dir1 = new File(path + memnum);
+			dir1.mkdir();
+			// 위에서 만든 멤버번호 폴더 밑에 옷장번호 하위폴더 하나 더 생성
+			File dir2 = new File(newpath); // 하위폴더 경로 설정
+			dir2.mkdir(); // 디렉토리 생성
 			String img = "";
 			String fname = f.getOriginalFilename();
 			System.out.println("fname : " + fname);
 			if(fname != null & !fname.equals("")) {
-				String newpath = path + num + "/" + fname; // C:/closet/num/fname..
-				File newfile = new File(newpath); // C:/closet/num/fname 복사 생성
+				newpath += "/" + fname; // C:/closet/memnum/clothnum/fname..
+				System.out.println("파일 경로: " + newpath);
+				File newfile = new File(newpath); // C:/closet/memnum/clothnum/fname.. 복사 생성
 				try {
 					f.transferTo(newfile); // 파일 업로드하기
 					img = newpath;
@@ -62,7 +68,7 @@ public class OmyclosetController {
 				}
 			}
 			dto.setImg(img); // dto에 img경로 넣어주기
-			dto.setClosetnum(num); // num 덮어쓰기 안하면 img null인 것과 아래에서 완전체 둘 다 생성됨 why?
+			dto.setClosetnum(closetnum); // num 덮어쓰기 안하면 img null인 것과 아래에서 완전체 둘 다 생성됨 why?
 		} catch (Exception e) {
 			flag = false;
 		}
@@ -98,13 +104,13 @@ public class OmyclosetController {
 		boolean flag = true;
 		OmyclosetDto dto = service.getMyCloth(closetnum);
 		try {
+			int memnum = dto.getMemnum().getMemnum();
 			String img = "";
 			String oldpath = dto.getImg(); // 원본(옛날옷)의 파일명
-//			MultipartFile newf = dto2.getF();
 			String newfname = newf.getOriginalFilename(); // 받아온 옷(수정된)의 파일명
 			if(newfname != null & !newfname.equals("")) { // 받아온 옷이 null이 아니라면,
-				String newpath = path + closetnum + "/" + newfname; // C:/closet/num/newfname.. 수정된 옷의 새로운 경로 지정
-				File newfile = new File(newpath); // 새로운 경로 C:/closet/num/newfname 복사 생성
+				String newpath = path + memnum + "/" + closetnum + "/" + newfname; // C:/closet/memnum/closetnum/newfname.. 수정된 옷의 새로운 경로 지정
+				File newfile = new File(newpath); // 새로운 경로 C:/closet/memnum/closetnum/newfname 복사 생성
 				try {
 					String delimg = oldpath; // 원본파일경로
 					File oldfile = new File(delimg); // 원본파일 삭제 객체 생성
@@ -164,9 +170,10 @@ public class OmyclosetController {
 	// 옷장 전체 리스트 뿌리기(GET)
 	@GetMapping("")
 	public Map getAll() {
-		ArrayList<OmyclosetDto> list = service.getAll();
+		ArrayList<OmyclosetDto> list = service.getAllByOrder();
 		Map map = new HashMap<>();
 		map.put("list", list);
+		System.out.println(list);
 		return map;
 	}
 	
@@ -218,10 +225,11 @@ public class OmyclosetController {
 	}
 	
 	// 옷 이미지 추출하기
-	@GetMapping("/img/{closetnum}")
-	public ResponseEntity<byte[]> read_img(@PathVariable("closetnum") int closetnum) {
+	@GetMapping("/img/{memnum}/{closetnum}")
+	public ResponseEntity<byte[]> read_img(@PathVariable("closetnum") int closetnum, @PathVariable("memnum") int memnum) {
 		String fname = "";
-		OmyclosetDto dto = service.getMyCloth(closetnum);
+		OmyclosetDto dto = new OmyclosetDto();
+		dto = service.getMyCloth(closetnum);
 		fname = dto.getImg();
 		// 응답 객체를 생성해서 반환. 응답 객체는 헤더와 바디. 헤더:목적지주소, 나의주소, 마임타입, 크기...
 		// 바디. 전송할 데이터
@@ -243,9 +251,17 @@ public class OmyclosetController {
 	// 옷 삭제하기(Delete(closetnum))
 	@DeleteMapping("/{closetnum}")
 	public Map delete(@PathVariable("closetnum") int closetnum) {
-		System.out.println("왔다");
 		boolean flag = true;
 		try {
+			
+			OmyclosetDto dto = service.getMyCloth(closetnum);
+			int memnum = dto.getMemnum().getMemnum();
+			String filePath = dto.getImg();
+			String folderPath = path + memnum + "/" + closetnum;
+			File oldfile = new File(filePath);
+			File folder = new File(folderPath);
+			oldfile.delete();
+			folder.delete();
 			service.delete(closetnum);
 		} catch (Exception e) {
 			flag = false;
