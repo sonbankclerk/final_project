@@ -1,93 +1,103 @@
 <template>
-    <div>
-        <input type="file" multiple @change="FileUpload" :disabled="selectedFiles.length >= 3">
-        <div class="image-container">
-            <button @click="perImg">이전</button>
-            <div v-for="image in previewImages" :key="image.name" class="image-wrapper">
-                <img :src="image.url" :alt="image.name">
+
+    <h3>게시글 등록</h3>
+    <hr class="addhr">
+    <div class="container">
+        <div>
+            <img style="width: 250px; height: 300px;" :src="currentPhoto"><br>
+            <div class="cir" style="margin-right: 12%; margin-left: 12%;">
+                <div v-for="(photo, index) in photos" :key="index" class="circle" :class="{ active: currentPhotoIndex === index }" @click="changePhoto(index)"></div>
             </div>
-            <button @click="nextImg">다음</button>
-            <!-- <button class="btn btn-primaty">부트스트랩</button> -->
-        </div>
-        <br>
-        <button class="ml-3">등록</button>
+
+            <div>
+                <input type="text" v-model="tag" placeholder="예) #오피스룩 #안유진 #미미" style="margin-bottom: 1%; width: 20%; object-fit: contain;">
+            </div>
+
+            <div>
+                <input type="file" id="f1" @change="handleFile(0)">
+                <br>
+                <input type="file" id="f2" @change="handleFile(1)">
+                <br>
+                <input type="file" id="f3" @change="handleFile(2)">
+            </div>
+        </div>    
+    </div>
+    
+    <div>
+        <button style="margin-top: 5px;" @click="add">등록</button>  
     </div>
 </template>
-
-<style scoped>
-.image-container {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-    justify-content: center;
-}
-
-.image-wrapper {
-    width: 100px;
-    height: 100px;
-    margin: 5px;
-    border: 5px solid #ccc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
-
-.image-wrapper img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover;
-}
-
-input[type="file"] {
-    margin-bottom: 10px;
-}
-
-input[type="text"] {
-    width: 30%;
-    padding: 5px;
-    margin-bottom: 10px;
-}
-
-button {
-    padding: 10px 20px;
-    background-color: #4cd3f5;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #4550a0;
-}
-</style>
 
 <script>
 export default {
     data() {
         return {
-            selectedFiles: [],
-            previewImages: []
-        };
+            tag: '',
+            files: [],
+            photos: [null, null, null],
+            currentPhotoIndex: 0,
+            memnum: sessionStorage.getItem('memnum')
+        }
+    },
+    computed: {
+        currentPhoto() {
+            return this.photos[this.currentPhotoIndex];
+        }
     },
     methods: {
-        FileUpload(event) {
-            const files = event.target.files;
-            const newFiles = Array.from(files).slice(0, 3 - this.selectedFiles.length);
-            for (let i = 0; i < newFiles.length; i++) {
-                const file = newFiles[i];
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.previewImages.push({
-                        name: file.name,
-                        url: e.target.result,
-                    });
-                };
-                reader.readAsDataURL(file);
-                this.selectedFiles.push(file);
-            }
+        handleFile(index) {
+            const file = event.target.files[0];
+            this.photos[index] = URL.createObjectURL(file);
+            this.files[index] = file;
         },
-        
-    },
-};
+        changePhoto(index) {
+            this.currentPhotoIndex = index;
+        },
+        add() {
+            const self = this;
+            let formData = new FormData();
+            formData.append('tag', self.tag);
+            formData.append('memnum', self.memnum);
+            this.files.forEach((file) => {
+                formData.append('mfArr', file);
+                
+            });
+
+            self.$axios.post('http://localhost:8081/ocommunity', formData, { headers: {"Content-Type": "multipart/form-data"} })
+            .then(function(){
+                self.$router.push('/listboard');
+            });
+        }
+    }
+}
 </script>
+
+<style scoped>
+body {
+    object-fit: contain;
+}
+.container {
+    /* display: flex; */
+    align-items: center;
+}
+.circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgb(228, 213, 213);
+    margin-right: 10px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.active {
+    background-color: rgb(24, 186, 235);
+}
+
+.addhr {
+    width: 25%;
+    margin-left: auto;
+    margin-right: auto;
+    border: solid 5px #336399;;
+}
+</style>
