@@ -10,7 +10,25 @@
         pwd: <input type="password" v-model="pwd"> <br/>
         <span v-if="!validatePassword(pwd)" style="color: red;">비밀번호 형식이 올바르지 않다.</span><br/>
 
-        email: <input type="text" v-model="email"><br/>
+        email: <input type="text" v-model="emailId">@
+        <select v-model="emailDomain">
+            <option>naver.com</option>
+            <option>gamil.com</option>
+            <option>daum.net</option>
+        </select>
+        <button v-on:click="authEmail" id="authEmail">인증번호 받기</button><br/>
+        인증번호: <input type="text" v-model="authKey" id="authKey" disabled>
+        <input type="text" v-model="compKey" style="display: none;"> <!-- 서버사이드에서 받은 인증키 비교 위해 저장해놓을 더미용 -->
+        <button v-on:click="checkKey" disabled id="checkKey">인증번호 확인</button>
+        <!-- 인증번호 받기 누르면 시작되는 타이머 -->
+        <div id="timer">
+            <span id="displayedTime" style="color:lightgray">3분0초</span>
+        </div>
+
+        
+        <br/>
+
+
         gender: <select v-model="gender">
                     <option value="male">남성</option>
                     <option value="female">여성</option>
@@ -29,6 +47,11 @@ export default{
             id: '',
             pwd:'',
             email:'',
+            emailId:'',
+            emailDomain:'',
+            compKey:'',
+            startTimer:'',
+            authComplete:0,
             gender:'',
             nickname:'',
             msg:''
@@ -121,6 +144,63 @@ export default{
             //4~12자리, 공백X, 한글X, 영문+숫자, 영대문자1개 포함, 특수문자포함
             const pattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{4,12}$/;
             return pattern.test(password);
+        },
+
+        authEmail() {
+            const self = this;
+            clearInterval(self.startTimer);
+            self.email = self.emailId + '@' + self.emailDomain;
+            self.$axios.get('http://localhost:8081/members/email/' + self.email)
+            .then(function(res){
+                if(res.status == 200){
+                    let exist = res.data.exist;
+                    let key = res.data.key;
+                    let authEmail = document.getElementById('authEmail');
+                    let authKey = document.getElementById('authKey');
+                    let checkKey = document.getElementById('checkKey');
+                    let displayedTime = document.getElementById('displayedTime');
+                    if(key == null) {
+                        alert(exist);
+                    } else {
+                        authEmail.innerText = '인증번호 재발급'
+                        authKey.disabled = false;
+                        authKey.focus();
+                        checkKey.disabled = false;
+                        self.compKey = key;
+                        let secondsLeft = 180; // 3분
+                        self.startTimer = setInterval(function() {
+                            let minutes = Math.floor(secondsLeft / 60);
+                            let seconds = secondsLeft % 60;
+                            let timerText = minutes + "분" + seconds + "초";
+                            displayedTime.style.color = 'black';
+                            displayedTime.innerText = timerText;
+                            if(secondsLeft <= 0) {
+                                clearInterval(self.startTimer);
+                                authKey.disabled = true;
+                                checkKey.disabled = true;
+                                self.compKey = '';
+                            }
+                            secondsLeft --;
+                        }, 1000);
+
+                    }
+                }else{
+                    alert('에러코드:'+res.status)
+                }
+            });
+        },
+
+        checkKey() {
+            const self = this;
+            let displayedTime = document.getElementById('displayedTime');
+            if(self.authKey == self.compKey) {
+                clearInterval(self.startTimer);
+                displayedTime.innerText = "인증이 완료되었습니다."
+                self.authComplete = 0;
+            } else {
+                alert('인증번호가 틀렸습니다.')
+                self.authComplete = 1;
+            }
         }
     }
 }

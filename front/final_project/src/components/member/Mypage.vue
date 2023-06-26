@@ -9,6 +9,7 @@
 
         <label for ="newimg">
             img:<img :src= "profileImg()" style="cursor: pointer;"><br/>
+            
         </label>
         <input type="file" id="newimg" accept="img/*" @change="changeImg"><br/>
         <button v-on:click="edit">수정</button>
@@ -27,7 +28,10 @@ export default{
             gender:'',
             nickname:'',
             num : sessionStorage.getItem('memnum'),
-            img:''
+            img:'',
+            uploadImg:'null',
+            defaultImg: require('@/assets/default.jpg'),
+            previewImg:''
         }
     },
 
@@ -47,6 +51,7 @@ export default{
                     self.email=dto.email
                     self.gender=dto.gender
                     self.nickname=dto.nickname
+                    self.img=dto.img
                 }else{
                     alert('없는 아이디거나 만료된 토큰')
                 }
@@ -56,7 +61,6 @@ export default{
         });
     },
     
-
     methods:{
 
         //프로필사진
@@ -68,13 +72,18 @@ export default{
             }
         },
 
-        //내정보수정(비밀번호, 닉네임)
+        //내정보수정(비밀번호, 닉네임, 이미지)
         edit(){
             const self = this
             let formdata = new FormData();
             formdata.append('memnum',self.num)
             formdata.append('pwd',self.pwd)
             formdata.append('nickname', self.nickname)
+            if(self.uploadImg){
+                formdata.append('mf', self.uploadImg)
+            }else{
+                formdata.append('mf', null)
+            }
              let token = sessionStorage.getItem('token')
             self.$axios.put('http://localhost:8081/members',formdata,
             {headers:{'token':token}})
@@ -84,6 +93,7 @@ export default{
                         let dto = res.data.dto
                         self.pwd = dto.pwd
                         self.nickname = dto.nickname
+                        self.img = dto.img
                         location.reload()
                     }else{
                         alert("false가 넘어옴")
@@ -101,28 +111,12 @@ export default{
                 const reader = new FileReader();
                 const self = this;
                 reader.onload = function(){
-                    self.img = reader.result;
-                    self.uploadimg = file;
+                    self.previewImg = reader.result;
+                    self.uploadImg = file;
                 };
                 reader.readAsDataURL(file);
             }
         },
-        
-        //  handleImgClick(){
-        //      this.$refs.fileInput.click(); //이미지 클릭시 파일 선택창 열기
-        //  },
-        // handleFileChange(event){
-        //     const file = event.target.files[0] //선택파일
-
-        //     if(file){
-        //         const reader = new FileReader();
-        //         const self = this; //컴포넌트 인스턴스에 접근하기 위해 self 변수로 저장
-        //         reader.onload = function(e) {
-        //             self.img = e.target.result; //이미지 경로 설정
-        //         };
-        //         reader.readAsDataURL(file);
-        //     }
-        // },
 
         //로그아웃
         logout(){
