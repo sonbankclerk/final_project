@@ -1,5 +1,7 @@
 package com.example.demo.community;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.demo.member.Omember;
 
 import lombok.AllArgsConstructor;
@@ -27,5 +29,7 @@ public class OcommunityDto {
 	private String img1;
 	private String img2;
 	private String img3;
+	
+	//private MultipartFile[] f = new MultipartFile[3];
 	
 }
