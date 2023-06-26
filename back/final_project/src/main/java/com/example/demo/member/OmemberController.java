@@ -7,12 +7,15 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +42,9 @@ public class OmemberController {
 	@Autowired
 	private JwtTokenProvider tokenprovider;
 
+	@Autowired
+	private JavaMailSender javaMailSender;
+
 	@Value("${spring.servlet.multipart.location}")
 	private String path;
 
@@ -45,10 +52,10 @@ public class OmemberController {
 	@PostMapping("")
 	public Map join(@RequestParam("mf") MultipartFile mf, OmemberDto dto) {
 //		OmemberDto d = service.save(dto);
-		//Map map = new HashMap();
+		// Map map = new HashMap();
 		Map map = new HashMap();
 		boolean flag = true;
-		
+
 		try {
 			dto = service.save(dto);
 			File dir = new File(path + dto.getMemnum());
@@ -72,8 +79,8 @@ public class OmemberController {
 		map.put("dto", dto);
 		return map;
 	}
-	
-	//회원가입(이미지X)
+
+	// 회원가입(이미지X)
 	@PostMapping("/omem")
 	public Map join(OmemberDto dto) {
 		OmemberDto d = service.save(dto);
@@ -101,7 +108,7 @@ public class OmemberController {
 
 	// 수정(닉네임, 비밀번호)
 	@PutMapping("")
-	public Map edit(OmemberDto dto, @RequestHeader(name = "token", required = false) String token) {
+	public Map edit(OmemberDto dto,@RequestParam("mf") MultipartFile mf, @RequestHeader(name = "token", required = false) String token) {
 		boolean flag = true;
 		Map map = new HashMap();
 		System.out.println("dto : " + dto);
@@ -119,8 +126,33 @@ public class OmemberController {
 			OmemberDto old = service.getByMemnum(dto.getMemnum());
 			old.setPwd(dto.getPwd());
 			old.setNickname(dto.getNickname());
-			OmemberDto d = service.save(old);
-			map.put("dto", d);
+			
+			try {
+				if(mf != null) {
+					//기존 이미지가 있는 경우 삭제
+					String oldImgPath = old.getImg();
+					if(oldImgPath != null && !oldImgPath.isEmpty()) {
+						File oldImgFile = new File(URLDecoder.decode(oldImgPath, "utf-8"));
+						oldImgFile.delete();
+					}
+					//새로운 이미지 저장
+					File dir = new File(path + old.getMemnum());
+					dir.mkdir();
+					
+					String fname = mf.getOriginalFilename();
+					String newpath = dir.getAbsolutePath() + "\\" + fname;
+					File newFile = new File(newpath);
+					
+					mf.transferTo(newFile);
+					
+					old.setImg(URLEncoder.encode(newpath, "utf-8"));
+				}
+				OmemberDto updateDto = service.save(old);
+				map.put("dto", updateDto);
+			}catch(Exception e) {
+				e.printStackTrace();
+				flag = false;
+			}
 		}
 		map.put("flag", flag);
 		return map;
@@ -172,7 +204,8 @@ public class OmemberController {
 
 	// 내 정보 보기.
 	@GetMapping("/{memnum}")
-	public Map getInfo(@PathVariable("memnum") int memnum, @RequestHeader(name = "token", required = false) String token) {
+	public Map getInfo(@PathVariable("memnum") int memnum,
+			@RequestHeader(name = "token", required = false) String token) {
 		Map map = new HashMap();
 		boolean flag = true;
 		try {
@@ -188,8 +221,8 @@ public class OmemberController {
 		System.out.println(map);
 		return map;
 	}
-	
-	//중복체크
+
+	// 중복체크
 	@GetMapping("/check/{id}")
 	public Map get(@PathVariable("id") String id) {
 		Map map = new HashMap();
@@ -197,16 +230,69 @@ public class OmemberController {
 		boolean tf = true;
 		try {
 			dto = service.getById(id);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if(dto != null) {
+		if (dto != null) {
 			tf = false;
 		}
-		
-		System.out.println("tf : "+tf);
+
+		System.out.println("tf : " + tf);
 		map.put("tf", tf);
 		return map;
 	}
-	
+
+	// email 중복 체크
+	@ResponseBody
+	@GetMapping("/email/{email}")
+	public Map getByEmail(@PathVariable("email") String email) {
+		Map map = new HashMap<>();
+//		System.out.println(testemail);
+//		String email = testemail + "@" + domain + ".com";
+		OmemberDto dto = service.getByEmail(email);
+		if (dto != null) {
+			// 이메일 존재하면 보내는 키값
+			map.put("exist", "이미 존재하는 이메일입니다.");
+		} else {
+			Random random = new Random(); // 난수 생성을 위한 랜덤 클래스
+			String key = ""; // 인증번호
+
+			SimpleMailMessage message = new SimpleMailMessage(); // 이메일 제목, 내용 작업 메서드
+			message.setTo(email); // 스크립트에서 보낸 메일을 받을 사용자 이메일 주소
+			// 입력 키를 위한 코드
+			// 인증키 예시 = AB1234
+			for (int i = 0; i < 2; i++) {
+				int index = random.nextInt(26) + 65; // A~Z까지 랜덤 알파벳 생성.. 0~25 + 65 = 65~90 => char 변환.. 알파벳 생성
+				key += (char) index;
+			}
+			for (int i = 0; i < 4; i++) {
+				int numIndex = random.nextInt(10); // 6자리 랜덤 정수를 생성 .. 0~9
+				key += numIndex;
+			}
+			String mail = "\n인증번호 입력창에 입력 후 가입을 완료해주세요.";
+			message.setSubject("회원가입을 위한 이메일 인증번호 전송 메일입니다."); // 이메일 제목
+			message.setText("인증번호는 " + key + " 입니다." + mail); // 이메일 내용
+			try {
+				javaMailSender.send(message); // 이메일 전송
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			// 인증키 전송
+			map.put("key", key);
+		}
+		return map;
+
+	}
+
+//	//프로필변경
+//	@PostMapping("/updateImg")
+//	public Map updateImg(@RequestParam("nmf"), MultipartFile mf, @RequestParam("memnum") int memnum) {
+//		
+//		String oldFilePath = dto.getImg();
+//		if(oldFilePath != null && !oldFilePath.isEmpty()) {
+//			File oldFile = new File(URLDecoder.decode(oldFilePath, "utf-8"));
+//			oldFile.delete();
+//		}
+//	}
+
 }

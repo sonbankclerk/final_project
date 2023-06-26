@@ -70,5 +70,14 @@ public class OmemberService {
 		return (OmemberDto)change(m);
 	}
 	
+	// 이메일로 조회
+	public OmemberDto getByEmail(String email) {
+		Omember m = dao.findByEmail(email);
+		if(m == null) {
+			return null;
+		}
+		return (OmemberDto)change(m);
+	}
+	
 	
 }

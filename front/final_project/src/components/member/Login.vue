@@ -1,8 +1,12 @@
 <template>
     <div id="login">
-        <h3>로그인폼</h3>
-        id: <input type="text" v-model="id"> <br/>
-        pwd: <input type="password" v-model="pwd"><br/>
+        <h3>옷짱(로고)</h3>
+        <div class="form-group">
+            <input type="text" id="id" v-model="id" placeholder="ID" class="input-field" @focus="cPlaceholder($event)">
+        </div>
+        <div class="form-group">
+            <input type="password" id="pwd" v-model="pwd" placeholder="Password" class="input-field" @focus="cPlaceholder($event)"><br/>
+        </div>
         <button v-on:click="login">로그인</button>
     </div>
 </template>
@@ -38,24 +42,75 @@ export default{
                     alert('에러코드:'+res.status)
                 }
             });
-        }
+        },
+        
+        //로그인, 패스워드 포커스시 placeholder 값 초기화
+        cPlaceholder(event){
+            event.target.placeholder= '';
+        },
+
     }
 }
 </script>
 
 <style scoped>
+#login{
+    display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #ffffff;
+  max-width: 400px;
+  margin: 0 auto;
+  }
+
 h3 {
-    margin: 40px 0 0;
+    margin: 0;
+    margin-bottom: 20px;
+    text-align: center;
   }
-  ul {
-    list-style-type: none;
-    padding: 0;
+
+  
+  .form-group{
+    margin-bottom:10px;
+    width: 100%;
   }
-  li {
-    display: inline-block;
-    margin: 0 10px;
+
+  label{
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: left;
   }
-  a {
-    color: #42b983;
+  
+  .input-field{
+    width: 100%;
+  padding: 8px;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  background-color: transparent;
+  outline: none;
   }
+
+  .input-field:focus{
+    border-bottom: 2px solid #000000;
+  }
+
+  button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 12px;
+  background-color: #ebebeb;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #000000;
+}
 </style>
