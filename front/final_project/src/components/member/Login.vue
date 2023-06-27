@@ -1,14 +1,36 @@
 <template>
     <div id="login">
         <h3>옷짱(로고)</h3>
-        <div class="form-group">
-            <input type="text" id="id" v-model="id" placeholder="ID" class="input-field" @focus="cPlaceholder($event)">
+        
+        <div class="form_group">
+            <div :class="{'input_box_error' : hasIdError}">
+            <label for ="id" :class="{'input_label': id}">ID</label>
+            <input type="text" id="id" v-model="id" placeholder="ID" :class="{'input_field': true, 'input_field_error': hasIdError }" @focus="cPlaceholder($event)" @blur="rPlaceholder($event)" @input="validateId($event)">
         </div>
-        <div class="form-group">
-            <input type="password" id="pwd" v-model="pwd" placeholder="Password" class="input-field" @focus="cPlaceholder($event)"><br/>
+        <p class="input_error" v-if="hasIdError">영문과 숫자 8자 이상 16자 이하로 입력해주세요.</p>
         </div>
-        <button v-on:click="login">로그인</button>
+        <div class="form_group">
+            <div :class="{'input_box_error' : hasPwdError}">
+            <label for="pwd" :class="{'input_label': pwd}">Password</label>
+            <input type="password" id="pwd" v-model="pwd" placeholder="Password" :class="{'input_field': true, 'input_field_error': hasPwdError }" @focus="cPlaceholder($event)" @blur="rPlaceholder($event)" @input="validatePwd($event)"><br/>
+        </div>
+        <p class="input_error" v-if="hasPwdError">대문자, 영문, 숫자, 특수문자를 조합해서 입력해주세요. (4-12자)</p>
+        </div>
+        <!-- <button v-on:click="login" :disabled="!isFormValid">로그인</button> -->
+        <button v-on:click="login" >로그인</button>
+        <ul class="look_box">
+            <li class="look_list">
+                <a href="../Join" class="look_link">가입</a>
+            </li>
+            <li class="look_list">
+                <a href="" class="look_link">아이디 찾기</a>
+            </li>
+            <li class="look_list">
+                <a href="" class="look_link">비밀번호 찾기</a>
+            </li>
+        </ul>
     </div>
+    
 </template>
 
 <script>
@@ -17,9 +39,18 @@ export default{
     data(){
         return{
             id:'',
-            pwd:''
+            pwd:'',
+            hasIdError:false,
+            hasPwdError:false
         }
     },
+
+    computed:{
+        isFormValid(){
+            return !this.hasIdError && !this.hasPwdError;
+        }
+    },
+
     methods:{
         login(){
             const self = this;
@@ -44,11 +75,37 @@ export default{
             });
         },
         
-        //로그인, 패스워드 포커스시 placeholder 값 초기화
+        //로그인, 패스워드 포커스시 초기화, 복구
         cPlaceholder(event){
+            event.target.previousElementSibling.classList.add('active');
             event.target.placeholder= '';
         },
+        rPlaceholder(event){
+            const inputField = event.target;
+            const label = inputField.previousElementSibling;
+            if(!inputField.value){
+                label.classList.remove('active');
+                if(inputField.id ==='id'){
+                    inputField.placeholder = 'ID';
+                }else if(inputField.id === 'pwd'){
+                    inputField.placeholder = 'Password';
+                }
+            }
+        },
 
+        //아이디 정규화(8~12자리 이상 영문)
+        validateId(event){
+            const id = event.target.value;
+            const regex = /^[a-zA-Z0-9]{8,12}$/;
+            this.hasIdError = !regex.test(id);
+        },
+
+        //비밀번호 정규화
+        validatePwd(event){
+            const pwd = event.target.value;
+            const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{4,12}$/;
+            this.hasPwdError = !regex.test(pwd);
+        }
     }
 }
 </script>
@@ -73,19 +130,23 @@ h3 {
   }
 
   
-  .form-group{
+  .form_group{
     margin-bottom:10px;
     width: 100%;
   }
+
 
   label{
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
     text-align: left;
+    font-size: 13px;
+    padding-left: 8px;
   }
   
-  .input-field{
+  .input_field{
+    position: relative;
     width: 100%;
   padding: 8px;
   border: none;
@@ -94,8 +155,30 @@ h3 {
   outline: none;
   }
 
-  .input-field:focus{
+  #login .input_field:focus{
     border-bottom: 2px solid #000000;
+  }
+  
+  .input_field:focus + .input_label{
+    top: -10px;
+    font-size: 10px;
+    color: #000000;
+  }
+
+  .input_error{
+    display: block;
+    color:#f15746;
+    margin-top: 5px;
+    text-align: left;
+    font-size: 11px;
+    padding-left: 8px;
+  }
+
+  .input_field_error, 
+  .input_box_error .input_field,
+  .input_box_error .input_label,
+  .input_box_error .input_error{
+    border-bottom-color: 2px solid #f15746;
   }
 
   button {
@@ -104,13 +187,33 @@ h3 {
   padding: 10px;
   border: none;
   border-radius: 12px;
-  background-color: #ebebeb;
+  background-color: #000000;
   color: #fff;
   font-weight: bold;
-  cursor: pointer;
 }
 
-button:hover {
-  background-color: #000000;
+button.active{
+    background: #000000 !important;
+    cursor: pointer  !important;
 }
+
+.look_box{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-right: 40px;
+}
+
+.look_list{
+   display: inline-flex;
+   align-items: flex-start;
+   flex: 1;
+}
+
+.look_link{
+    margin: auto;
+    display: inline-flex;
+    font-size: 13px;
+}
+
 </style>
