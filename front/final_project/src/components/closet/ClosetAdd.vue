@@ -31,7 +31,7 @@ export default {
             memnum: null,
             selectedmain: '',
             selectedsub: '',
-            maintags: ['아우터', '상의', '하의', '기타', 'acc'],
+            maintags: ['아우터', '상의', '하의', '기타', '신발'],
             subtags: '',
             clothname: ''
         }
@@ -60,15 +60,15 @@ export default {
         updatesub() {
             this.selectedsub = '';
             if (this.selectedmain == '아우터') {
-                this.subtags = ['코트', '패딩', '야상']
+                this.subtags = ['가디건', '자켓', '야상', '트렌치코트', '코트', '패딩', 'etc']
             } else if (this.selectedmain == '상의') {
-                this.subtags = ['긴팔', '반팔', '맨투맨']
+                this.subtags = ['민소매', '반팔', '긴팔티', '셔츠', '니트', '맨투맨', 'etc']
             } else if (this.selectedmain == '하의') {
-                this.subtags = ['청바지', '반바지', '슬랙스']
+                this.subtags = ['반바지', '치마', '면바지', '청바지', '레깅스', 'etc']
             } else if (this.selectedmain == '기타') {
-                this.subtags = ['원피스', '점프수트', '한벌옷']
-            } else if (this.selectedmain == 'acc') {
-                this.subtags = ['모자', '신발', '귀걸이']
+                this.subtags = ['스타킹', '히트텍', '기모제품', '목도리', 'etc']
+            } else if (this.selectedmain == '신발') {
+                this.subtags = ['샌들', '슬리퍼', '운동화', '등산화', '구두', 'etc']
             }
         },
         addcloset() {

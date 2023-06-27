@@ -14,13 +14,22 @@ import jakarta.transaction.Transactional;
 public interface OmyclosetDao extends JpaRepository<Omycloset, Integer> {
 	
 	// 대분류 카테고리(1, 2, 3, 4, 5) 리스트 검색하기
-	ArrayList<Omycloset> findByMaintag(String maintag);
+	@Transactional
+	@Modifying
+	@Query(value="select * from omycloset where maintag=:maintag order by favorite desc, closetnum desc", nativeQuery = true)
+	ArrayList<Omycloset> findByMaintag(@Param("maintag") String maintag);
 	
 	// 소분류 카테고리(11, 12, 13, 14..., 51, 52, 53, 54, 55...)리스트 검색하기
-	ArrayList<Omycloset> findBySubtag(String subtag);
+	@Transactional
+	@Modifying
+	@Query(value="select * from omycloset where subtag=:subtag order by favorite desc, closetnum desc", nativeQuery = true)
+	ArrayList<Omycloset> findBySubtag(@Param("subtag") String subtag);
 	
 	// 옷 이름 키워드 리스트 검색하기
-	ArrayList<Omycloset> findByClothLike(String cloth);
+	@Transactional
+	@Modifying
+	@Query(value="select * from omycloset where cloth=:cloth order by favorite desc, closetnum desc", nativeQuery = true)
+	ArrayList<Omycloset> findByClothLike(@Param("cloth") String cloth);
 	
 	// 즐겨찾기 순서 => 최신 등록순
 	@Transactional

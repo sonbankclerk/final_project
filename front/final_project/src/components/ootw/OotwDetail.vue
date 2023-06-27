@@ -1,18 +1,15 @@
 <template>
     <div>
         <h3> 나 뭐 입었더라?</h3>
-        <img :src="'http://localhost:7878/closets/img/' + memnum + '/' + clothnum1">
-        <img :src="'http://localhost:7878/closets/img/' + memnum + '/' + clothnum2">
-        <img :src="'http://localhost:7878/closets/img/' + memnum + '/' + clothnum3">
-        <img :src="'http://localhost:7878/closets/img/' + memnum + '/' + clothnum4">
-        <img :src="'http://localhost:7878/closets/img/' + memnum + '/' + clothnum5"><br/>
-        아우터 / 상의 / 하의 / 기타 / acc<br/><br/>
+        <span v-for="src in clothnum" :key="src">
+        <img :src="'http://localhost:7878/closets/img/' + memnum + '/' + src" alt="sdf">
+        </span>
+        <br/><br/>
         날짜: <input type="text" v-model="odate" readonly><br/>
         날씨: <input type="text" v-model="weather" readonly><br/>
-        기온: <input type="text" v-model="temp" readonly><br/>
+        기온: <input type="text" v-model="temp" readonly><br/><br/>
         이 날의 커멘트<br/>
-        <textarea v-model="comments" cols="30" rows="5" style="resize:none" maxlength="100" readonly></textarea><br/>
-        
+        <textarea v-model="comments" cols="30" rows="5" style="resize:none" maxlength="100" readonly></textarea><br/><br/><br/>
     </div>
 </template>
 
@@ -22,11 +19,7 @@
         data () {
             return {
                 ootwnum : this.$route.query.ootwnum,
-                clothnum1: '',
-                clothnum2: '',
-                clothnum3: '',
-                clothnum4: '',
-                clothnum5: '',
+                clothnum:[],
                 memnum: '',
                 odate: '',
                 weather: '',
@@ -50,20 +43,9 @@
                         self.weather = dto.weather
                         self.temp = dto.temp
                         self.comments = dto.comments
-                        // for(let i=0; i<5; i++){
-                        //     if(list[i] == null) {
-                        //         list[i].closetnum.closetnum = 999999999;
-                        //     } else {
-                                
-                        //     }
-                        //     return;
-                        // }
-                        self.clothnum1 = list[0].closetnum.closetnum;
-                        self.clothnum2 = list[1].closetnum.closetnum;
-                        self.clothnum3 = list[2].closetnum.closetnum;
-                        self.clothnum4 = list[3].closetnum.closetnum;
-                        self.clothnum5 = list[4].closetnum.closetnum;
-                        // alert('http://localhost:7878/closets/img/' + self.memnum + '/' + self.clothnum1)
+                        for(let i = 0 ; i < list.length; i++){
+                            self.clothnum.push(list[i].closetnum.closetnum);
+                        }
                     } else {
                         alert('에러코드: ' + res.status)
                     }

@@ -122,8 +122,10 @@ public class OootwController {
 	}
 	
 	// 날짜 검색 리스트 뿌리기.. GET(/dates/odate)
-	@GetMapping("/dates/{odate1}/{odate2}")
-	public Map getByDate(@PathVariable("odate1") Date odate1, @PathVariable("odate2") Date odate2) {
+	@GetMapping("/dates/{date1}/{date2}")
+	public Map getByDate(@PathVariable("date1") String date1, @PathVariable("date2") String date2) {
+		String odate1 = date1.substring(2, 4) + "/" + date1.substring(5, 7) + "/" + date1.substring(8, 10);
+		String odate2 = date2.substring(2, 4) + "/" + date2.substring(5, 7) + "/" + date2.substring(8, 10);
 		System.out.println(odate1);
 		System.out.println(odate2);
 		ArrayList<OootwDto> list = service.getByDateBetween(odate1, odate2);

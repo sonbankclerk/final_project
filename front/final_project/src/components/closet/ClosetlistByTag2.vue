@@ -16,8 +16,8 @@
             </div>
         </div><br />
 
-        <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
-            <b-card-group deck v-for="(row, index) in additionalCloset" :key="index">
+        <div>
+            <b-card-group deck v-for="(row, index) in additionalCloset" :key="index" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
                 <b-card v-for="closet in row" :key="closet.closetnum"
                     :img-src="'http://localhost:7878/closets/img/' + memnum + '/' + closet.closetnum" img-top
                     style="max-width:200px; height: auto; flex: 0 0 250px;">
@@ -53,7 +53,7 @@ export default {
             additionalCloset: [],
             closetPerPage: 5,
             currentPage: 1,
-            maintags: ['전체', '아우터', '상의', '하의', '기타', 'acc'],
+            maintags: ['전체', '아우터', '상의', '하의', '기타', '신발'],
             subtags: [],
             memnum: sessionStorage.getItem('memnum'),
             cloth: ''
@@ -134,7 +134,8 @@ export default {
                 .then(function (res) {
                     if (res.status == 200) {
                         if (res.data.flag) {
-                            self.additionalCloset = self.additionalCloset.map(row => row.filter(closet => closet.closetnum != closetnum));
+                            location.reload();
+                            // self.additionalCloset = self.additionalCloset.map(row => row.filter(closet => closet.closetnum != closetnum));
                             // self.additionalCloset = self.additionalCloset.filter(closet => closet.closetnum != closetnum);
                             // filter() method: 자바스크립트의 배열 method..
                             // 주어진 배열(self.closetlist)을 method 내부에 있는 조건에 만족하는 열들을 새로운 배열로 생성하는 method
@@ -172,38 +173,29 @@ export default {
                     }
                 })
         },
-        clothserach() {
-            const self = this;
-            var cloth = self.cloth;
-            self.$axios.get('http://localhost:7878/closets/clothes/' + cloth)
-                .then(function (res) {
-                    if (res.status == 200) {
-                        self.closetlist = res.data.list
-                        self.cloth = '';
-                    } else {
-                        alert('에러코드' + res.status)
-                    }
-                })
-        },
         selectsub(index) {
             const self = this;
             if (index == 0) {
                 self.subtags = []
             } else if (index == 1) {
-                self.subtags = ['아우터(전체)', '코트', '패딩', '야상']
+                self.subtags = ['아우터(전체)', '가디건', '자켓', '야상', '트렌치코트', '코트', '패딩', 'etc']
             } else if (index == 2) {
-                self.subtags = ['상의(전체)', '긴팔', '반팔', '맨투맨']
+                self.subtags = ['상의(전체)', '민소매', '반팔', '긴팔티', '셔츠', '니트', '맨투맨', 'etc']
             } else if (index == 3) {
-                self.subtags = ['하의(전체)', '청바지', '반바지', '슬랙스']
+                self.subtags = ['하의(전체)', '반바지', '치마', '면바지', '청바지', '레깅스', 'etc']
             } else if (index == 4) {
-                self.subtags = ['기타(전체)', '원피스', '점프수트', '한벌옷']
+                self.subtags = ['기타(전체)', '스타킹', '히트텍', '기모제품', '목도리', 'etc']
             } else if (index == 5) {
-                self.subtags = ['acc(전체)', '모자', '신발', '귀걸이']
+                self.subtags = ['신발(전체)', '샌들', '슬리퍼', '운동화', '등산화', '구두', 'etc']
             }
         },
         listbytag(subtag, index) {
             const self = this;
             self.$router.push({ name: 'ClosetlistByTag', query: { tag: subtag, index: index } });
+        },
+        clothserach() {
+            const self = this;
+            self.$router.push({ name: 'ClosetlistByCloth', query: { cloth: self.cloth } });
         }
     }
 }
