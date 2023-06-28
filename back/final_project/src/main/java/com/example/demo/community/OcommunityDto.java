@@ -1,6 +1,5 @@
 package com.example.demo.community;
 
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.member.Omember;
 
@@ -20,7 +19,8 @@ public class OcommunityDto {
 	private int commnum;
 	private Omember memnum;
 	private String tag;
-	private int btnlike;
+	
+	
 	
 //	private int btngood;
 //	private int btnwhat;
@@ -29,7 +29,7 @@ public class OcommunityDto {
 	private String img1;
 	private String img2;
 	private String img3;
-	
+	private int btnlike;
 	//private MultipartFile[] f = new MultipartFile[3];
 	
 }

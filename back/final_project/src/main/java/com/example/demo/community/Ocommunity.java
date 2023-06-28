@@ -3,6 +3,7 @@ package com.example.demo.community;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.example.demo.likebnt.Olikebtn;
 import com.example.demo.member.Omember;
 
 import jakarta.persistence.Column;
@@ -38,8 +39,6 @@ public class Ocommunity {
 	private String tag;
 	
 	
-	//기능 한개로 통일
-	private int btnlike; //좋아요
 	
 	//삭제
 	//private int btngood; //멋져요
@@ -54,13 +53,5 @@ public class Ocommunity {
 
 	private String img3;
 	
-	@PrePersist
-	public void preprocess() { // 디폴트 값 : 0
-		btnlike = 0;
-		
-		//삭제
-		//btngood = 0; 
-		//btnwhat = 0;
-		//btnsad = 0;
-	}
+	private int btnlike;
 }

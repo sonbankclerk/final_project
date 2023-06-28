@@ -19,15 +19,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.likebnt.OlikebtnDto;
 import com.example.demo.likebnt.OlikebtnService;
-import com.example.demo.omycloset.OmyclosetDto;
+import com.example.demo.member.Omember;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -73,14 +71,27 @@ public class OcommunityController {
 		String fname = "";
 		OcommunityDto dto = service.getByCommnum(commnum);
 		
-		if(index == 1) {
-			fname = dto.getImg1();
-		} else if(index == 2) {
-			fname = dto.getImg2();
-		} else if(index == 3) {
-			fname = dto.getImg3();
-		}
+//		if(index == 1) {
+//			fname = dto.getImg1();
+//		} else if(index == 2) {
+//			fname = dto.getImg2();
+//		} else if(index == 3) {
+//			fname = dto.getImg3();
+//		}
 		
+		switch (index) {
+		case 1:
+			fname = dto.getImg1();
+			break;
+		case 2:
+			fname = dto.getImg2();
+			break;
+		case 3:
+			fname = dto.getImg3();
+			break;
+		default:
+			return null;
+		}
 		// 응답 객체를 생성해서 반환. 응답 객체는 헤더와 바디. 헤더:목적지주소, 나의주소, 마임타입, 크기...
 		// 바디. 전송할 데이터
 		File f = new File(fname);
@@ -138,10 +149,16 @@ public class OcommunityController {
 		System.out.println("mfArr.length : " + mfArr.length);
 		boolean flag = true;
 		try {
+			
 			// 게시글 이미지들이 들어가있을 폴더
-			File dir = new File(path + dto.getCommnum());
+			dto.setImg1("temp");
+			OcommunityDto odto = service.save(dto);
+			String dirPath = path + odto.getCommnum();
+			System.out.println("odto: " + odto);
+			File dir = new File(dirPath); // C:/comm/ 게시글번호 / 1, 2, 3
+			System.out.println("경로: " + dirPath);
 			dir.mkdir();
-
+			
 			// 이미지들 폴더에 생성하기.
 			String[] imgs = new String[3];
 			for (int i = 0; i < mfArr.length; i++) {
@@ -163,10 +180,10 @@ public class OcommunityController {
 			}
 
 			// 삽입된 파일이 있다면 dto 업데이트 후 다시 저장.
-			dto.setImg1(imgs[0]);
-			dto.setImg2(imgs[1]);
-			dto.setImg3(imgs[2]);
-			service.save(dto);
+			odto.setImg1(imgs[0]);
+			odto.setImg2(imgs[1]);
+			odto.setImg3(imgs[2]);
+			service.save(odto);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -182,6 +199,29 @@ public class OcommunityController {
 		Map map = new HashMap<>();
 		boolean flag = true;
 		try {
+
+			// commnum의 게시물 뽑아오기.
+			OcommunityDto dto = service.getByPost(commnum);
+
+			// 게시물의 img들 뽑아오기.
+			String img1 = dto.getImg1();
+			String img2 = dto.getImg2();
+			String img3 = dto.getImg3();
+			// for문을 돌리기 위한 배열 생성
+			String[] imgArr = {img1,img2,img3};
+			
+			for(int i = 0 ; i < 3; i++) {
+				// 배열에 들어 있는 img 경로를 담을 임시 String
+				// 파일에 직접 접근하기 위해서 만들었다.
+				String tempImg = imgArr[i];
+				// 파일의 경로가 null일 수도 있으므로 예외처리를 해준다.
+				if(tempImg != null) {
+					// file을 찾고 삭제한다.
+					File delFile = new File(tempImg);
+					delFile.delete();
+				}
+			}
+			
 			service.delOcommunity(commnum);
 		} catch (Exception e) {
 			e.printStackTrace();

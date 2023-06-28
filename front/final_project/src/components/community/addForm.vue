@@ -62,7 +62,6 @@ export default {
                 formData.append('mfArr', file);
                 
             });
-
             self.$axios.post('http://localhost:8081/ocommunity', formData, { headers: {"Content-Type": "multipart/form-data"} })
             .then(function(){
                 self.$router.push('/listboard');
