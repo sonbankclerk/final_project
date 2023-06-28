@@ -9,7 +9,7 @@
         <li>{{ nowTmp }}℃</li> <br />
         <li>{{ nowSky }}</li> <br />
         <li>{{ nowPop }}</li> <br />
-        <li>H: {{ todayTmx }}℃ L: {{ todayTmn }}℃</li>
+        <li>H: {{ todayTmx }}° L: {{ todayTmn }}°</li>
       </ul>
     </div>
 
@@ -30,28 +30,57 @@
     <!-- 옷 추천~~ -->
     <h3>기온별 옷차림</h3>
     <div>
-      {{ recommend }}
+      {{ recommend }} <br />
       {{ message }}
 
+      <!-- 태그별 옷추천 -->
       <div v-if="showRecom">
-        
-        <b-card-group deck v-for="(row, index) in additionalCloset" :key="index" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
-          <b-card v-for="closet in row" :key="closet.closetnum"
-            :img-src="'http://localhost:8081/closets/img/' + memnum + '/' + closet.closetnum" img-top
-            style="max-width:200px; height: auto; flex: 0 0 250px;">
-            <b-card-text>
-              {{ closet.maintag }}<br />
-              {{ closet.subtag }}<br />
-              <a v-on:click="detail(closet.closetnum)">{{ closet.cloth }}</a><br />
-            </b-card-text>
-            <template #footer>
-              <small class="text-muted">
-                <b-button v-on:click="deletecloth(closet.closetnum)">삭제</b-button>
-              </small>
-            </template>
-          </b-card>
-        </b-card-group>
-        <b-button v-on:click="moreBtn">더보기</b-button>
+
+        <!-- v-for) subtags 배열을 반복하면서 각 subtag에 대한 작업을 수행
+        v-bind:value와 v-bind:key는 subtag 값을 해당 HTML 요소의 속성에 바인딩합니다. 
+        이렇게 하면 각 subtag에 대해 고유한 값을 가지게 됩니다. -->
+        <div v-for="subtag in subtags" v-bind:value="subtag" v-bind:key="subtag">
+          <br />
+          <h5>{{ subtag }}</h5>
+          <div v-if="naverList[subtag] != null">
+            {{ message2 }} <br />
+            <b-button @click="shopping(subtag)">{{ subtag }} 쇼핑하러 가기</b-button>
+          </div>
+          <div>
+            <!-- :key="subtag"는 Vue의 key 속성을 사용하여 "각 그룹"을 고유하게 식별 => subtag 별 그룹 생성 -->
+            <b-card-group deck :key="subtag"
+              style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
+              <!-- v-for) additionalCloset[subtag] 배열을 반복하면서 각 cloth에 대한 작업을 수행 -->
+              <b-card v-for="cloth in additionalCloset[subtag]" :key="cloth.closetnum"
+                :img-src="'http://localhost:8081/closets/img/' + memnum + '/' + cloth.closetnum" overlay
+                style="max-width:200px; height:auto; flex: 0 0 250px;" @click="detail(cloth.closetnum)"
+                @mouseover="cursorChange">
+                <template #footer>
+                  <small class="text-muted">
+                    {{ cloth.cloth }}<br />
+                  </small>
+                </template>
+              </b-card>
+            </b-card-group>
+            <!-- <b-button v-on:click="moreBtn">더보기</b-button> -->
+          </div>
+
+          <!-- 태그에 옷이 없을 때 띄울 네이버 쇼핑 링크 -->
+          <div>
+            <b-card-group deck :key="subtag"
+              style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
+              <b-card v-for="(dto, i) in naverList[subtag]" :key="i" :img-src="dto.img" overlay
+                style="max-width:200px; height: auto; flex: 0 0 250px;" @click="shoppingLink(subtag, i)"
+                @mouseover="cursorChange">
+                <template #footer>
+                  <small class="text-muted">
+                    {{ dto.price }}원<br />
+                  </small>
+                </template>
+              </b-card>
+            </b-card-group>
+          </div>
+        </div>
 
       </div>
 
@@ -61,6 +90,8 @@
 </template>
 
 <script>
+
+
 export default {
   name: 'TodayWeather',
   data() {
@@ -74,6 +105,7 @@ export default {
       yesterday: '', // 어제 날짜 20230623
       tomorrow: '', // 내일 날짜 20230625
       nowTime: '', // 현재 시간 1600
+      today_sunrise: '', // 오늘 일출
       today_sunset: '', // 오늘 일몰
       tomorrow_sunrise: '', // 내일 일출
       tomorrow_sunset: '', // 내일 일몰
@@ -90,10 +122,22 @@ export default {
       memnum: sessionStorage.getItem("memnum"),
       recommend: '...로딩중 *^^*',
       message: '',
+      message2: '옷장이 비었네요!',
       showRecom: false,
       //currentPage: 1
       subtags: [],
-      additionalCloset: []
+      /*
+      additionalCloset을 []로 데이터 속성으로 선언
+      -> Vue의 반응적인(reactive) 데이터 시스템에 의해 관리되는 배열
+      --> JavaScript 객체처럼 사용하여 동적으로 속성을 추가하고 값을 할당할 수 있음!!
+      => this.additionalCloset[sub] :  additionalCloset 객체에 sub라는 속성을 동적으로 추가
+      추가된 속성은 Vue에 의해 반응적으로 추적되지는 않지만, 반복문 등을 통해 해당 속성을 접근하여 사용할 수 있음~
+
+      즉, additionalCloset 객체는 Vue의 반응성과는 별개로 동작하는 일반적인 JavaScript 객체이며, 
+      동적으로 속성을 추가하고 값을 할당할 수 있는 특징을 가지고 있음~~
+      */
+      additionalCloset: [], // 여기에 사실상 additionalCloset['반팔'], additionalCloset['셔츠'] .. 가 다 들어있는거임!
+      naverList: []
     }
   },
   created() {
@@ -105,7 +149,7 @@ export default {
     this.textContent = 'Locating...';
 
     // Get position
-    navigator.geolocation.getCurrentPosition(pos => {
+    navigator.geolocation.getCurrentPosition(async pos => {
       this.latitude = pos.coords.latitude;
       this.longitude = pos.coords.longitude;
       this.textContent = 'Your location data is ' + this.latitude + ', ' + this.longitude;
@@ -114,10 +158,6 @@ export default {
       this.sunTime(this.today)
       this.sunTime(this.tomorrow)
       this.weather(this.recommendation) // 파라메터로 메서드도 넣을 수 있다구~~
-      for(let i=0; i<this.subtags.length; i++){
-        let sub = this.subtags[i]
-        this.getList(sub)
-      }
     }, err => {
       console.log(err);
       this.textContent = err.message;
@@ -129,7 +169,7 @@ export default {
       this.sunTime(this.tomorrow)
       this.weather(this.recommendation)
     });
-    
+
     // 현재 로그인 상태 확인.
     let token = sessionStorage.getItem('token');
     if (this.memnum == null) {
@@ -137,15 +177,11 @@ export default {
       this.showRecom = false;
     } else {
       this.$axios.get(`http://localhost:8081/members/${this.memnum}`,
-      { headers: { 'token': token } })
-      .then(res => {
-        if (res.status == 200) {
-          this.showRecom = !this.showRecom;
-          for(let i=0; i<this.subtags.length; i++){
-            let sub = this.subtags[i]
-            this.getList(sub)
-          }
-        } else {
+        { headers: { 'token': token } })
+        .then(async res => {
+          if (res.status == 200) {
+            this.showRecom = !this.showRecom;
+          } else {
             alert("오류 발생으로 인한 로그인 정보 불러오기 실패")
           }
         })
@@ -153,24 +189,10 @@ export default {
 
   },
   methods: {
-    // 소분류로 옷장 옷 검색 (전체 중 5개만)
-    getList(sub) {
-      const self = this;
-      self.memnum = sessionStorage.getItem('memnum')
-      self.$axios.get('http://localhost:8081/closets/subtags/' + sub)
-        .then(function (res) {
-          if (res.status == 200) {
-            // 컴포넌트 처음 로딩될 때 옷장에서 999999999번 default(기본이미지) 걸러서 리스트에 넣기
-            let closetlist = res.data.list.filter(closet => closet.closetnum != 999999999);
-            let addtionalRow = closetlist.slice(0, 5);
-            self.additionalCloset.push(addtionalRow);
-          } else {
-            alert('에러코드: ' + res.status)
-          }
-        })
-    },
-    // 온도 별 옷추천~
-    recommendation() {
+    // 온도 별 옷추천 및 소분류로 옷장 옷 검색 (전체 중 5개만)
+    // 동기 함수로 하게되면 데이터가 완전히 로드되기 전에 b-card-group 및 b-card 요소가 렌더링되므로 원하는 리스트가 생성되지 않습니다.
+    // async -> 비동기 함수 정의. 
+    async recommendation() {
       var tmp = this.nowTmp;
       let recommend = '';
       let subtags = [];
@@ -208,6 +230,56 @@ export default {
       }
       this.recommend = recommend;
       this.subtags = subtags;
+
+      // 소분류로 옷장 옷 검색 (전체 중 5개만)
+      for (let i = 0; i < this.subtags.length; i++) {
+        let subtag = this.subtags[i];
+        try {
+          // await -> 비동기 작업인 self.$axios.get(...)의 결과를 기다립니다.
+          const res = await this.$axios.get('http://localhost:8081/closets/subtags/' + subtag);
+          if (res.status === 200) {
+            // 컴포넌트 처음 로딩될 때 옷장에서 999999999번 default(기본이미지) 걸러서 리스트에 넣기
+            let closetlist = res.data.list.filter(closet => closet.closetnum !== 999999999);
+            let addtionalRow = closetlist.slice(0, 5);
+            // 배열에 subtag 속성 추가해서 검색 결과를 각각 담음.
+            this.additionalCloset[subtag] = addtionalRow; // additionalCloset 객체에 속성으로 추가
+
+            // 검색된 옷이 없으면 네이버 검색 띄워주기
+            if (closetlist.length === 0) {
+              const result = await this.$axios.get('http://localhost:8081/naver/' + subtag)
+              if (result.status == 200) {
+                let allList = result.data.list;
+                let fivelist = allList.slice(0, 5);
+                this.naverList[subtag] = fivelist;
+
+                // for (let i = 0; i < self.naverList[subtag].length; i++) {
+                //   let span = document.getElementById(i);
+                //   span.innerHTML = self.naverList[i].title; // 불러오는 텍스트에 태그도 섞여있음!
+                // }
+                window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+              } else {
+                alert("실패 시발!")
+              }
+            }
+          } else {
+            alert('에러코드: ' + res.status);
+          }
+        } catch (error) {
+          alert('에러 발생: ' + error);
+        }
+      }
+
+    },
+    shopping(subtag) {
+      let link = "https://search.shopping.naver.com/search/all?query=" + subtag;
+      window.open(link);
+    },
+    shoppingLink(subtag, i) {
+      let link = this.naverList[subtag][i].link;
+      window.open(link, "_blank");
+    },
+    cursorChange(e) {
+      e.target.style.cursor = "pointer";
     },
     // 위경도 좌표를 xy좌표로 변환하는 메서드
     dfsXyConv(v1, v2) {
@@ -316,7 +388,7 @@ export default {
                 let fcstValue = element.fcstValue;
 
                 if (category == 'TMP') {
-                  eachTime.tmp = fcstValue + '℃';
+                  eachTime.tmp = fcstValue + '°';
                   if (this.today == fcstDate && this.nowTime == temp) {
                     this.nowTmp = fcstValue;
                   }
@@ -366,58 +438,93 @@ export default {
                 }
                 return false;
               });
-              // 24시간 날씨 배열에 끼워넣을 일출일몰 객체 
-              let todaySunset = { fcstDate: this.today, fcstTime: this.today_sunset, sky: 100, pty: '', pop: '', tmp: 'sunset' };
-              let tomorrowSunrise = { fcstDate: this.tomorrow, fcstTime: this.tomorrow_sunrise, sky: 200, pty: '', pop: '', tmp: 'sunrise' };
-              let tomorrowSunset = { fcstDate: this.tomorrow, fcstTime: this.tomorrow_sunset, sky: 100, pty: '', pop: '', tmp: 'sunset' };
 
-              // 일몰 시간이 아직 지나지 않았을 때
-              if (this.nowTime.substring(0, 2) <= this.today_sunset.substring(0, 2)) {
+
+              // 날씨 배열에 끼워넣을 일출일몰 객체 
+              let todaySunriseObject = { fcstDate: this.today, fcstTime: this.today_sunrise, sky: 200, pty: '', pop: '', tmp: 'sunrise' };
+              let todaySunsetObject = { fcstDate: this.today, fcstTime: this.today_sunset, sky: 100, pty: '', pop: '', tmp: 'sunset' };
+              let tomorrowSunriseObject = { fcstDate: this.tomorrow, fcstTime: this.tomorrow_sunrise, sky: 200, pty: '', pop: '', tmp: 'sunrise' };
+              let tomorrowSunsetObject = { fcstDate: this.tomorrow, fcstTime: this.tomorrow_sunset, sky: 100, pty: '', pop: '', tmp: 'sunset' };
+
+              // 조건별로 일출일몰 객체 다르게 끼워넣기~
+              // (1) now = 0000 ~ 일출
+              // (2) now = 일출 ~ 일몰
+              // (3) now = 일몰 ~ 0000
+              if (this.nowTime.substring(0, 2) <= this.today_sunrise.substring(0, 2)) {
+                // (1) 막 하루가 지났을 때 => now(0000) ..(밤).. 오늘 일출 ... 오늘 일몰 ..(밤).. (0000)
                 // findIndex(): 조건에 맞는 첫 번째 요소의 인덱스 값을 반환. 없으면 -1.
-                let tdsunset_index = this.everyTime.findIndex((eachTime) => eachTime.fcstTime.substring(0, 2) === this.today_sunset.substring(0, 2));
-                let tmsunrise_index = this.everyTime.findIndex((eachTime) => eachTime.fcstTime.substring(0, 2) === this.tomorrow_sunrise.substring(0, 2));
+                let todaySR = this.everyTime.findIndex((eachTime) => eachTime.fcstTime.substring(0, 2) === this.today_sunrise.substring(0, 2));
+                let todaySS = this.everyTime.findIndex((eachTime) => eachTime.fcstTime.substring(0, 2) === this.today_sunset.substring(0, 2));
                 // 일출, 일몰 기준으로 배열 자르기~~
-                let first = this.everyTime.slice(0, tdsunset_index + 1);
-                let second = this.everyTime.slice(tdsunset_index + 1, tmsunrise_index + 1);
-                let third = this.everyTime.slice(tmsunrise_index + 1, this.everyTime.length);
+                let first = this.everyTime.slice(0, todaySR + 1);
+                let second = this.everyTime.slice(todaySR + 1, todaySS + 1);
+                let third = this.everyTime.slice(todaySS + 1, this.everyTime.length);
 
-                for (const eachTime of second) { // 밤에는 밤 아이콘을 띄워줘야함~
+                for (const eachTime of first) { // now ~ 일출 (밤)
+                  eachTime.sky = +eachTime.sky + 8;
+                  if (eachTime.pty != 0) {
+                    eachTime.pty = +eachTime.pty + 8;
+                  }
+                }
+                for (const eachTime of third) { // 일몰 ~ (밤)
                   eachTime.sky = +eachTime.sky + 8;
                   if (eachTime.pty != 0) {
                     eachTime.pty = +eachTime.pty + 8;
                   }
                 }
                 // 일출일몰 껴서 배열 다시 생성~
-                first.push(todaySunset);
-                second.push(tomorrowSunrise);
+                first.push(todaySunriseObject); // 오늘 일출 추가
+                second.push(todaySunsetObject); // 오늘 일몰 추가
                 this.everyTime = first.concat(second, third);
 
-              } else { // 일몰시간이 지났을 때~~~~~~~~~~~~
-                let tmsunrise_index = this.everyTime.findIndex((eachTime) => eachTime.fcstTime.substring(0, 2) === this.tomorrow_sunrise.substring(0, 2));
-                let tmsunset_index = this.everyTime.findIndex((eachTime) => eachTime.fcstTime.substring(0, 2) === this.tomorrow_sunset.substring(0, 2));
+              } else if (this.nowTime.substring(0, 2) <= this.today_sunset.substring(0, 2)) {
+                // (2) 해는 떴지만 아직 지지 않았을 때 => now(0700) ... 오늘 일몰 ..(밤).. 내일 일출 ... (0700)
+                let todaySS = this.everyTime.findIndex((eachTime) => eachTime.fcstTime.substring(0, 2) === this.today_sunset.substring(0, 2));
+                let tomorrowSR = this.everyTime.findIndex((eachTime) => eachTime.fcstTime.substring(0, 2) === this.tomorrow_sunrise.substring(0, 2));
 
-                let first = this.everyTime.slice(0, tmsunrise_index + 1);
-                let second = this.everyTime.slice(tmsunrise_index + 1, tmsunset_index + 1);
-                let third = this.everyTime.slice(tmsunset_index + 1, this.everyTime.length);
+                let first = this.everyTime.slice(0, todaySS + 1);
+                let second = this.everyTime.slice(todaySS + 1, tomorrowSR + 1);
+                let third = this.everyTime.slice(tomorrowSR + 1, this.everyTime.length);
 
-                for (const eachTime of first) { // 밤에는 밤 아이콘을 띄워줘야함~
+                for (const eachTime of second) { // 일몰 ~ 일출 (밤)
                   eachTime.sky = +eachTime.sky + 8;
                   if (eachTime.pty != 0) {
                     eachTime.pty = +eachTime.pty + 8;
                   }
                 }
-                for (const eachTime of third) { // 밤에는 밤 아이콘을 띄워줘야함~
+
+                first.push(todaySunsetObject); // 오늘 일몰 추가
+                second.push(tomorrowSunriseObject); // 내일 일출 추가
+                this.everyTime = first.concat(second, third);
+
+              } else {
+                // (3) 해가 졌을 때 => now(2100) ..(밤).. 내일 일출 ... 내일 일몰 ..(밤).. (2100)
+                let tomorrowSR = this.everyTime.findIndex((eachTime) => eachTime.fcstTime.substring(0, 2) === this.tomorrow_sunrise.substring(0, 2));
+                let tomorrowSS = this.everyTime.findIndex((eachTime) => eachTime.fcstTime.substring(0, 2) === this.tomorrow_sunset.substring(0, 2));
+
+                let first = this.everyTime.slice(0, tomorrowSR + 1);
+                let second = this.everyTime.slice(tomorrowSR + 1, tomorrowSS + 1);
+                let third = this.everyTime.slice(tomorrowSS + 1, this.everyTime.length);
+
+                for (const eachTime of first) { // now ~ 일출 (밤)
                   eachTime.sky = +eachTime.sky + 8;
                   if (eachTime.pty != 0) {
                     eachTime.pty = +eachTime.pty + 8;
                   }
                 }
-                first.push(tomorrowSunrise);
-                second.push(tomorrowSunset);
+                for (const eachTime of third) { // 일몰 ~ (밤)
+                  eachTime.sky = +eachTime.sky + 8;
+                  if (eachTime.pty != 0) {
+                    eachTime.pty = +eachTime.pty + 8;
+                  }
+                }
+                first.push(tomorrowSunriseObject); // 내일 일출 추가
+                second.push(tomorrowSunsetObject); // 내일 일몰 추가
                 this.everyTime = first.concat(second, third);
               }
 
-              for (const eachTime of this.everyTime) { // 하늘상태와 강수형태가 섞이지 않게 하기~
+              // 하늘상태와 강수형태가 섞이지 않게 하기~
+              for (const eachTime of this.everyTime) { // 날씨 리스트
                 if (eachTime.pty != 0) { // 비가 내리면~
                   eachTime.sky = eachTime.pty; // sky에 값 몰아주기. pty는 안쓸변수임
                   eachTime.pty = '';
@@ -426,8 +533,7 @@ export default {
                   eachTime.pop = '';
                 }
               }
-
-              if (this.nowPty != 0) {
+              if (this.nowPty != 0) { // 현재
                 this.nowSky = this.nowPty;
                 this.nowPty = '';
               }
@@ -485,6 +591,7 @@ export default {
             let jsonData = JSON.stringify(xmlData); // xml -> json 형태의 String
             let objectData = JSON.parse(jsonData); // json 형태의 String -> object 타입의 json
             if (locdate === this.today) {
+              this.today_sunrise = objectData.response.body.items.item.sunrise;
               this.today_sunset = objectData.response.body.items.item.sunset;
             } else if (locdate === this.tomorrow) {
               this.tomorrow_sunrise = objectData.response.body.items.item.sunrise;
@@ -507,30 +614,42 @@ export default {
 </script>
 
 <style scoped>
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
+
+img {
+  width: 100%;
+  height: 100%;
+}
+
+
 h3 {
   margin: 40px 0 0;
 }
 
-.star {
-  margin-left: 150px;
-  margin-top: 1000px;
-  cursor: pointer;
-}
 
 table {
   margin-left: auto;
   margin-right: auto;
 }
 
+td {
+  margin-left: 5px;
+  margin-right: 5px
+}
+
 ul {
-  margin-left: 27%;
+  list-style-type: none;
+  padding: 0;
+  /* margin-left: 27%; */
   cursor: pointer;
 }
 
 li {
+  /* display: inline-block; */
+  /* margin: 0 10px; */
   list-style: none;
-  float: left;
-  margin-right: 80px;
+  /* float: left; */
+  /* margin-right: 80px; */
   cursor: pointer;
 }
 
