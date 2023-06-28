@@ -248,6 +248,7 @@ input[type=button]:hover{
   left:0;
   right:0;
   margin:auto;
+  padding-left:100px;
   width:1000px;
 }
 
@@ -258,6 +259,7 @@ ul{
   width: 125px;
   height: 360px;
   padding: 20px 50px;
+  margin-left:50px;
 }
 
 .card:hover{
