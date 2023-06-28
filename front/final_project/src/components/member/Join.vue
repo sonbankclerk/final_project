@@ -31,18 +31,19 @@
         <div class="form_group">
             <label for="email" :class="{input_label: email}">Email*</label>
             <input type="text" v-model="emailId" placeholder="예) intheham@tistory.com" class="input_field">
+            <!-- 이메일 인증 버튼 -->
+            <button v-on:click="authEmail" id="authEmail">인증번호 받기(수정예정)</button><br/>
         </div>
 
-        email: <input type="text" v-model="emailId">@
+        <!-- email: <input type="text" v-model="emailId">
+        @
         <select v-model="emailDomain">
             <option>naver.com</option>
             <option>gmail.com</option>
             <option>daum.net</option>
-        </select>
+        </select> -->
 
-        <!-- 이메일 인증 버튼 -->
-        <button v-on:click="authEmail" id="authEmail">인증번호 받기</button><br/>
-
+        
         <!-- 인증확인 -->
         인증번호(수정예정): <input type="text" v-model="authKey" id="authKey" disabled>
         <input type="text" v-model="compKey" style="display: none;"> <!-- 서버사이드에서 받은 인증키 비교 위해 저장해놓을 더미용 -->
@@ -76,8 +77,10 @@
         img(수정예정):<input type="file" id="f1"><br/>
 
         <!-- 가입버튼 -->
+        <div class="join_btn_box"> <!--padding:20px; 을 위해-->
         <button v-on:click="join" :disabled="!isJoinable">가입</button>
         <!-- <button v-else v-on:click="join" :disabled="isJoinable" class="joinBtn">가입</button> -->
+        </div>
     </div>
 </template>
 
@@ -96,13 +99,14 @@ export default{
             authComplete:0,
             gender:'',
             nickname:'',
-            msg:''
+            msg:'',
+
         }
     },
 
     computed:{
         isJoinable(){
-            return this.validatePassword(this.pwd) && this.msg === '사용가능한 아이디';
+            return this.validatePassword(this.pwd) && this.validateId(this.id);
         },
     },
 
@@ -185,7 +189,8 @@ export default{
         authEmail() {
             const self = this;
             clearInterval(self.startTimer);
-            self.email = self.emailId + '@' + self.emailDomain;
+            // self.email = self.emailId + '@' + self.emailDomain;
+            self.email = self.emailId;
             self.$axios.get('http://localhost:8081/members/email/' + self.email)
             .then(function(res){
                 if(res.status == 200){

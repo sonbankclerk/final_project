@@ -108,7 +108,7 @@ public class OmemberController {
 
 	// 수정(닉네임, 비밀번호)
 	@PutMapping("")
-	public Map edit(OmemberDto dto,@RequestParam("mf") MultipartFile mf, @RequestHeader(name = "token", required = false) String token) {
+	public Map edit(OmemberDto dto,@RequestParam(value = "mf", required = false) MultipartFile mf, @RequestHeader(name = "token", required = false) String token) {
 		boolean flag = true;
 		Map map = new HashMap();
 		System.out.println("dto : " + dto);
@@ -204,8 +204,7 @@ public class OmemberController {
 
 	// 내 정보 보기.
 	@GetMapping("/{memnum}")
-	public Map getInfo(@PathVariable("memnum") int memnum,
-			@RequestHeader(name = "token", required = false) String token) {
+	public Map getInfo(@PathVariable("memnum") int memnum, @RequestHeader(name = "token", required = false) String token) {
 		Map map = new HashMap();
 		boolean flag = true;
 		try {
@@ -247,8 +246,6 @@ public class OmemberController {
 	@GetMapping("/email/{email}")
 	public Map getByEmail(@PathVariable("email") String email) {
 		Map map = new HashMap<>();
-//		System.out.println(testemail);
-//		String email = testemail + "@" + domain + ".com";
 		OmemberDto dto = service.getByEmail(email);
 		if (dto != null) {
 			// 이메일 존재하면 보내는 키값
@@ -283,16 +280,20 @@ public class OmemberController {
 		return map;
 
 	}
-
-//	//프로필변경
-//	@PostMapping("/updateImg")
-//	public Map updateImg(@RequestParam("nmf"), MultipartFile mf, @RequestParam("memnum") int memnum) {
-//		
-//		String oldFilePath = dto.getImg();
-//		if(oldFilePath != null && !oldFilePath.isEmpty()) {
-//			File oldFile = new File(URLDecoder.decode(oldFilePath, "utf-8"));
-//			oldFile.delete();
-//		}
-//	}
-
+	
+	// 이메일로 아이디 찾기
+	@GetMapping("/email/find/{email}")
+	public Map findId(@PathVariable("email") String email){
+		Map map = new HashMap();
+		boolean flag = true;
+		try {
+			OmemberDto dto = service.getByEmail(email);
+			map.put("dto", dto);
+		}catch(Exception e) {
+			e.printStackTrace();
+			flag = false;
+		}
+		map.put("flag", flag);
+		return map;
+	}
 }
