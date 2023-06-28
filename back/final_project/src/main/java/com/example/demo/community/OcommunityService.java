@@ -20,13 +20,13 @@ public class OcommunityService {
 			// 만약 vo라면 temp에 vo클래스로 값을 넣어놓는다.
 			Ocommunity temp = (Ocommunity) obj;
 			// vo의 값들을 dto 생성자를 이용하여 새로 생긴 dto에 값을 기입해준 후 리턴한다.
-			return new OcommunityDto(temp.getCommnum(), temp.getMemnum(), temp.getTag(), temp.getBtnlike(),
-					temp.getImg1(), temp.getImg2(), temp.getImg3());
+			return new OcommunityDto(temp.getCommnum(), temp.getMemnum(), temp.getTag(), temp.getImg1(), temp.getImg2(),
+					temp.getImg3(), temp.getBtnlike());
 		} else {
 			// 반대로 한다.
 			OcommunityDto temp = (OcommunityDto) obj;
-			return new Ocommunity(temp.getCommnum(), temp.getMemnum(), temp.getTag(), temp.getBtnlike(),
-					 temp.getImg1(), temp.getImg2(), temp.getImg3());
+			return new Ocommunity(temp.getCommnum(), temp.getMemnum(), temp.getTag(), temp.getImg1(), temp.getImg2(),
+					temp.getImg3(), temp.getBtnlike());
 		}
 	}
 
@@ -57,33 +57,33 @@ public class OcommunityService {
 		ArrayList<OcommunityDto> list2 = changeList(list);
 		return list2;
 	}
-	
-	//회원번호로 검색
+
+	// 회원번호로 검색
 //	public OcommunityDto getByMemnum(int memnum) {
 //		Ocommunity entity = dao.findById(memnum).orElse(null);
 //		return (OcommunityDto) change(entity);
 //	}
-	
-	//게시글 번호로 검색
+
+	// 게시글 번호로 검색
 	public OcommunityDto getByCommnum(int commnum) {
 		Ocommunity entity = dao.findById(commnum).orElse(null);
 		return (OcommunityDto) change(entity);
 	}
 
-	//findBy컬럼명Like(컬럼타입)
+	// findBy컬럼명Like(컬럼타입)
 	// 태그별 검색
-	public ArrayList<OcommunityDto> getByTag(String tag){
-	      ArrayList<Ocommunity> list = (ArrayList<Ocommunity>) dao.findByTagLike("%" + tag + "%");
-	      ArrayList<OcommunityDto> list2 = changeList(list);
-	      return list2;
-	   }
+	public ArrayList<OcommunityDto> getByTag(String tag) {
+		ArrayList<Ocommunity> list = (ArrayList<Ocommunity>) dao.findByTagLike("%" + tag + "%");
+		ArrayList<OcommunityDto> list2 = changeList(list);
+		return list2;
+	}
 
 	// 좋아요 up
 	// btnlike = 좋아요 / num = 게시물 번호.
 	public void upBtn(int commnum) {
 		dao.upBtn(commnum);
 	}
-	
+
 	// 좋아요 down
 	public void downBtn(int commnum) {
 		dao.downBtn(commnum);
@@ -94,4 +94,13 @@ public class OcommunityService {
 		dao.deleteById(commnum);
 	}
 
+	// 게시글 한개 검색
+	public OcommunityDto getByPost(int commnum) {
+		Ocommunity vo = dao.findById(commnum).orElse(null);
+		if (vo == null) {
+			return null;
+		}
+		OcommunityDto dto = (OcommunityDto) change(vo);
+		return dto;
+	}
 }
