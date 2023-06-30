@@ -77,7 +77,5 @@ public class OmemberService {
 			return null;
 		}
 		return (OmemberDto)change(m);
-	}
-	
-	
+	}	
 }

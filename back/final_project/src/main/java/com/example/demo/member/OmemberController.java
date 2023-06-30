@@ -1,5 +1,6 @@
 package com.example.demo.member;
 
+import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -294,6 +295,57 @@ public class OmemberController {
 			flag = false;
 		}
 		map.put("flag", flag);
+		return map;
+	}
+	
+	// 아이디,이메일로 비밀번호 랜덤 변경
+//	@ResponseBody
+	@PostMapping("/findPwd/{email}")
+	public Map findPwd(@RequestParam("id") String id, @PathVariable("email") String email) {
+		Map map = new HashMap<>();
+		
+		OmemberDto d = service.getByEmail(email);
+		if(d != null && d.getId().equals(id) && d.getEmail().equals(email)) {
+			Random random = new Random(); // 난수생성을 위한 랜덤 클래스
+			String key = ""; // 인증번호
+			
+			SimpleMailMessage message = new SimpleMailMessage(); //이메일 제목, 내용 작업 메서드
+			message.setTo(email); // 스크립트에서 보낸 메일을 받을 사용자 이메일 주소
+			
+			// 입력 키를 위한 코드
+			for(int i=0; i<2; i++) {
+				int index = random.nextInt(26) + 65; // A~Z 까지 랜덤 알파벳 생성, 0~25 + 65 = 65~90 => char변환(알파벳 생성)
+				key += (char)index;
+			}
+			for(int i=0; i<1; i++) {
+				int speIndex = random.nextInt(15) + 33; //1자리 랜덤 특수문자 생성, 0~14 + 33 = 33 ~ 47 => char변환(특수문자 생성)
+				key += (char)speIndex;
+			}
+			for(int i=0; i<4; i++) {
+				int numIndex = random.nextInt(10); // 6자리 랜덤 정수를 생성, 0~9
+				key += numIndex;
+			}
+			
+			OmemberDto old = service.getByEmail(email);
+			old.setPwd(key);
+			
+			OmemberDto randomPwd = service.save(old);
+			
+			String mail = "\n 임시 비밀번호로 로그인하신 후 원하시는 비밀번호로 수정해서 이용하시기 바랍니다. ";
+			message.setSubject("옷짱에서 임시비밀번호를 알려드립니다."); // 메일제목
+			message.setText("임시비밀번호는 " + key + " 입니다. " + mail); // 메일내용
+			try {
+				javaMailSender.send(message); // 메일전송
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+			
+			// 인증키 전송, 비밀번호 변경
+			map.put("key", key);
+			map.put("randomPwd", randomPwd);
+		}else {
+			map.put("msg", "아이디 혹은 이메일이 틀렸습니다.");
+		}
 		return map;
 	}
 }

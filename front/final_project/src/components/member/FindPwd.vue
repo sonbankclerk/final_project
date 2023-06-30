@@ -12,22 +12,38 @@ export default{
     data(){
         return{
             id:'',
-            email:''
+            email:'',
+            msg:''
         }
     },
 
     methods:{
         find(){
             const self = this;
-            self.$axious.get("http://localhost:8081/members/email/" + self.email)
-            // .then(function(res){
-            //     if(res.status==200){
-            //         let dto = res.dto.data;
-                    
-            //     }else{
-            //         alert('에러코드:'+self.status)
-            //     }
-            // });
+            console.log(this.id)
+            let form = new FormData();
+            form.append("id",self.id);
+            self.$axios.post('http://localhost:8081/members/findPwd/' + self.email,
+            form)
+            .then(function(res){
+                console.log(self.id)
+                console.log(self.email)
+                if(res.status==200){
+                    let randomPwd = res.data.randomPwd.pwd;
+                    // let id = res.data.randomPwd
+                    // let email = res.data.randomPwd
+                    alert(randomPwd)
+                    if(randomPwd!=null){
+                        self.id = randomPwd.id;
+                        self.email = randomPwd.email;
+                        self.msg='';
+                    }else{
+                        self.msg='';
+                    }
+                }else{
+                    alert('에러코드:'+self.status)
+                }
+            });
         }
     }
 }

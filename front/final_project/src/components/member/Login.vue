@@ -245,7 +245,7 @@ button {
     width: 100%;
     display: flex;
     justify-content: center;
-    padding-right: 40px;
+    padding-top: 20px;
 }
 
 .look_list{
