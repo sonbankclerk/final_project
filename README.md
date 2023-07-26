@@ -3,7 +3,7 @@
 온라인 옷장 관리 & 날씨별 옷추천
 * * *
 <br><br/>
-![logo](https://github.com/sonbankclerk/final_project/assets/131222450/85eda5ec-68d4-4f52-afe9-f3b51d63f484)
+![logo](https://github.com/sonbankclerk/final_project/assets/131222450/73f56f68-07c9-4d95-9a72-89b6c074260b)
 <br><br/>
 ## 🔗 Link
 - **Deploy site :** 배포사이트 업로드 미정
