@@ -23,7 +23,7 @@ https://github.com/jooooooowon/final_project.git
 
 
 #
-* * *
+
 #
 # Introduction
 옷은 KOSTA 257기 파이널 프로젝트로 진행 되었으며 
