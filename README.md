@@ -1,9 +1,10 @@
+# 옷짱
+**온라인 옷장 관리 & 날씨별 옷추천 서비스**
 
-![logo](https://github.com/sonbankclerk/final_project/assets/131222450/73f56f68-07c9-4d95-9a72-89b6c074260b)
-<br><br/>
-
-## **옷짱**
-온라인 옷장 관리 & 날씨별 옷추천 서비스
+<p align="center">
+  <br>
+<img src="https://github.com/sonbankclerk/final_project/assets/131222450/73f56f68-07c9-4d95-9a72-89b6c074260b">
+</p>
 <br><br/>
 
 ## 🔗 Link
@@ -11,7 +12,7 @@
 https://github.com/sonbankclerk/final_project
 <br><br/>
 
-## 📋 Content
+## 📋 내용
 >  - [🧷 주제선정](#-주제선정)
 >  - [🧑🏻‍💻 팀원](#-팀원) 
 >  - [📑 특징](#-특징)  
@@ -20,8 +21,8 @@ https://github.com/sonbankclerk/final_project
 <br><br/>
 
 
-## Introduction
-- 옷짱은 KOSTA 257기 파이널 프로젝트로 진행 되었으며 
+## 소개
+> - 옷짱은 KOSTA 257기 파이널 프로젝트로 진행 되었으며 
 2023.06.12 ~ 2023.07.12 총 1개월간 설계 및 개발하였으며, 5명의 팀원이 함께 하였습니다.
 <br><br/>
 
