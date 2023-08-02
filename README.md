@@ -6,12 +6,9 @@
 ![logo](https://github.com/sonbankclerk/final_project/assets/131222450/73f56f68-07c9-4d95-9a72-89b6c074260b)
 <br><br/>
 ## 🔗 Link
-- **Deploy site :** 배포사이트 업로드 미정
-
 - **Github Repository :** 
 https://github.com/jooooooowon/final_project.git
-  
-- **Presentation :** pdf 파일 첨부예정
+
 <br><br/>
 ## 📖 Summary
 > ```Introduction```
