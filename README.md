@@ -1,10 +1,12 @@
 # 옷짱
-**온라인 옷장 관리 & 날씨별 옷추천 서비스**
+
 
 <p align="center">
   <br>
 <img src="https://github.com/sonbankclerk/final_project/assets/131222450/73f56f68-07c9-4d95-9a72-89b6c074260b">
 </p>
+
+**온라인 옷장 관리 & 날씨별 옷추천 서비스**
 <br><br/>
 
 ## 🔗 Link
@@ -29,7 +31,7 @@ https://github.com/sonbankclerk/final_project
 ## 🧷 주제선정
 > - 변덕스러운 날씨와 기온 변화로 '오늘 뭐입지?' 라는 물음표로 시작된 프로젝트
 > - 날씨에 따른 옷차림을 기록하고 온라인 옷장을 관리한다.
-> - '옷짱'은 본인의 옷장과 옷을 좋아하는 유저들의 옷에 짱을 가린다를 합쳐 옷짱이 탄생하였다.
+> - '옷짱'은 옷장과 옷을 좋아하는 유저들의 중 짱을 가린다를 합쳐 옷짱이 탄생하였다.
 <br><br/>
 
 ## 🧑🏻‍💻 팀원
@@ -51,30 +53,31 @@ https://github.com/sonbankclerk/final_project
 <br><br/>
 
 ## 🛠 기술스택
-### ✔️ Front-End
-> - jQuery v.1.12.4
-> - JavaScript
 
-### ✔️ Back-End
-> - Java v17
-> - Maven v3.6.3
-> - Spring framework v5.3.7
-> - Lombok v1.18.20
-> - Spring Data JPA
+### Back-End
+- <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"> <img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white">
 
-### ✔️ DataBase
-> - Oracle v22.2.1
+### DataBase
+- <img src="https://img.shields.io/badge/oracle-F80000?style=for-the-badge&logo=oracle&logoColor=white">
 
-### ✔️ Server
-> - Apache Tomcat v9.0.43
+### Front-End
+- <img src="https://img.shields.io/badge/vue.js-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white"> <img src="https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white"> <img src="https://img.shields.io/badge/css-1572B6?style=for-the-badge&logo=css3&logoColor=white">  <img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
 
-### ✔️ Open API 
+### Tool
+- <img src="https://img.shields.io/badge/eclipseide-2C2255?style=for-the-badge&logo=eclipseide&logoColor=white"> <img src="https://img.shields.io/badge/visualstudiocode-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white"> <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> <img src="https://img.shields.io/badge/sourcetree-0052CC?style=for-the-badge&logo=sourcetree&logoColor=white">
+
+### Open API 
 > - 네이버 쇼핑 API
 > - 기상청 단기예보 API
 > - 카카오맵 로컬 API
 > - 한국천문연구원 일ㆍ출몰 API
 <br><br/>
 
+## 배운 점 & 아쉬운 점
+<p align="justify">
+⚠️추가 예정⚠️
+</p>
+<br><br/>
 
 ## 📸 서비스 구현
 
